@@ -83,16 +83,11 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -std=gnu++17"
+					"fragment" : "-std=gnu++11"
 				}
 			],
 			"includes" : 
 			[
-				{
-					"backtrace" : 8,
-					"isSystem" : true,
-					"path" : "C:/msys64/mingw64/include"
-				},
 				{
 					"backtrace" : 8,
 					"isSystem" : true,
@@ -106,7 +101,7 @@
 				[
 					1
 				],
-				"standard" : "17"
+				"standard" : "11"
 			},
 			"sourceIndexes" : 
 			[
@@ -119,10 +114,6 @@
 	{
 		"commandFragments" : 
 		[
-			{
-				"fragment" : "-g",
-				"role" : "flags"
-			},
 			{
 				"fragment" : "",
 				"role" : "flags"

@@ -73,15 +73,15 @@ CMakeFiles/TuProyecto.dir/src/main.cpp.obj: CMakeFiles/TuProyecto.dir/includes_C
 CMakeFiles/TuProyecto.dir/src/main.cpp.obj: C:/Users/fpizarro/Desktop/MemoriaICI/src/main.cpp
 CMakeFiles/TuProyecto.dir/src/main.cpp.obj: CMakeFiles/TuProyecto.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\fpizarro\Desktop\MemoriaICI\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/TuProyecto.dir/src/main.cpp.obj"
-	C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/TuProyecto.dir/src/main.cpp.obj -MF CMakeFiles\TuProyecto.dir\src\main.cpp.obj.d -o CMakeFiles\TuProyecto.dir\src\main.cpp.obj -c C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/TuProyecto.dir/src/main.cpp.obj -MF CMakeFiles\TuProyecto.dir\src\main.cpp.obj.d -o CMakeFiles\TuProyecto.dir\src\main.cpp.obj -c C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp
 
 CMakeFiles/TuProyecto.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/TuProyecto.dir/src/main.cpp.i"
-	C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp > CMakeFiles\TuProyecto.dir\src\main.cpp.i
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp > CMakeFiles\TuProyecto.dir\src\main.cpp.i
 
 CMakeFiles/TuProyecto.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/TuProyecto.dir/src/main.cpp.s"
-	C:\msys64\ucrt64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp -o CMakeFiles\TuProyecto.dir\src\main.cpp.s
+	C:\msys64\mingw64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\fpizarro\Desktop\MemoriaICI\src\main.cpp -o CMakeFiles\TuProyecto.dir\src\main.cpp.s
 
 # Object files for target TuProyecto
 TuProyecto_OBJECTS = \
