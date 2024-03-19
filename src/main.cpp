@@ -105,10 +105,34 @@ Matrix getRotationMatrix() {
     return dot(rotationZ, dot(rotationY, rotationX));
 }
 
+// Función para rotar la cámara con el mouse
+void rotateCameraWithMouse(SDL_Event& event, float& cameraAngleX, float& cameraAngleY, float sensitivity) {
+    // Manejar eventos del mouse
+    if (event.type == SDL_MOUSEMOTION) {
+        // Obtener los desplazamientos del mouse
+        int deltaX = event.motion.xrel;
+        int deltaY = event.motion.yrel;
+
+        // Aplicar sensibilidad para controlar la velocidad de rotación
+        deltaX *= sensitivity;
+        deltaY *= sensitivity;
+
+        // Actualizar los ángulos de la cámara basados en los desplazamientos del mouse
+        cameraAngleY += deltaX;
+        cameraAngleX += deltaY;
+
+        // Limitar el ángulo vertical de la cámara entre -90 y 90 grados para evitar que la cámara rote demasiado hacia arriba o hacia abajo
+        if (cameraAngleX > 90.0f) {
+            cameraAngleX = 90.0f;
+        } else if (cameraAngleX < -90.0f) {
+            cameraAngleX = -90.0f;
+        }
+    }
+}
 
 // Dimensiones de la ventana
 const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_HEIGHT = 600;
 
 // Función para dibujar el contenido del archivo VTK en la pantalla
 void drawVTK(SDL_Renderer* renderer) {
@@ -143,6 +167,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Inicializar ángulos de cámara
+    float cameraAngleX = 0.0f;
+    float cameraAngleY = 0.0f;
+
+    // Sensibilidad del mouse
+    float sensitivity = 0.1f;
+
 
     std::vector<Point> points = {
         Point(-1, 1, 1),
@@ -155,9 +186,10 @@ int main(int argc, char* argv[]) {
         Point(-1, -1, -1)
     };
 
+
     Point screenShift(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
     Point screenShiftOpposite(-SCREEN_WIDTH / 2, -SCREEN_HEIGHT / 2);
-    int scale = 200;
+    int scale = 100;
 
     for (Point& p : points) {
         p.x = (scale * p.x + screenShift.x);
@@ -178,6 +210,7 @@ int main(int argc, char* argv[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
+            rotateCameraWithMouse(e, cameraAngleX, cameraAngleY, sensitivity);
         }
 
         /*
@@ -191,11 +224,11 @@ int main(int argc, char* argv[]) {
         // Actualizar la pantalla
         SDL_RenderPresent(renderer);
         */
-        for (Point &p : points) {
-            p = translate(screenShiftOpposite, p);
-            p = transform(rotationXYZ, p);
-            p = translate(screenShift, p);
-        }
+        //for (Point &p : points) {
+        //    p = translate(screenShiftOpposite, p);
+            //p = transform(rotationXYZ, p);
+        //    p = translate(screenShift, p);
+        //}
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderClear(renderer);
