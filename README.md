@@ -1,1 +1,3 @@
 # MemoriaICI
+
+INSTALAR MSYS2

@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/fpizarro/Desktop/MemoriaICI/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe  @CMakeFiles/TuProyecto.dir/includes_CXX.rsp -g -std=gnu++17 -o CMakeFiles\\TuProyecto.dir\\src\\main.cpp.obj -c C:\\Users\\fpizarro\\Desktop\\MemoriaICI\\src\\main.cpp",
+  "file": "C:/Users/fpizarro/Desktop/MemoriaICI/src/main.cpp",
+  "output": "CMakeFiles/TuProyecto.dir/src/main.cpp.obj"
+}
+]
