@@ -8,9 +8,12 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(SDL2 REQUIRED)
+find_package(OpenGL REQUIRED)
 
 include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIRS})
 
-add_executable(TuProyecto src/main.cpp)
-target_link_libraries(TuProyecto ${SDL2_LIBRARIES})
+
+add_executable(MemoriaIci src/main.cpp)
+target_link_libraries(MemoriaIci ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES})
 

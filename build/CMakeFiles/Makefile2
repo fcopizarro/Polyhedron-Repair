@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = C:\Users\fpizarro\Desktop\MemoriaICI\build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/TuProyecto.dir/all
+all: CMakeFiles/MemoriaIci.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -70,34 +70,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/TuProyecto.dir/clean
+clean: CMakeFiles/MemoriaIci.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/TuProyecto.dir
+# Target rules for target CMakeFiles/MemoriaIci.dir
 
 # All Build rule for target.
-CMakeFiles/TuProyecto.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\fpizarro\Desktop\MemoriaICI\build\CMakeFiles --progress-num=1,2 "Built target TuProyecto"
-.PHONY : CMakeFiles/TuProyecto.dir/all
+CMakeFiles/MemoriaIci.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\fpizarro\Desktop\MemoriaICI\build\CMakeFiles --progress-num=1,2 "Built target MemoriaIci"
+.PHONY : CMakeFiles/MemoriaIci.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/TuProyecto.dir/rule: cmake_check_build_system
+CMakeFiles/MemoriaIci.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\fpizarro\Desktop\MemoriaICI\build\CMakeFiles 2
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/TuProyecto.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/MemoriaIci.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\fpizarro\Desktop\MemoriaICI\build\CMakeFiles 0
-.PHONY : CMakeFiles/TuProyecto.dir/rule
+.PHONY : CMakeFiles/MemoriaIci.dir/rule
 
 # Convenience name for target.
-TuProyecto: CMakeFiles/TuProyecto.dir/rule
-.PHONY : TuProyecto
+MemoriaIci: CMakeFiles/MemoriaIci.dir/rule
+.PHONY : MemoriaIci
 
 # clean rule for target.
-CMakeFiles/TuProyecto.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/clean
-.PHONY : CMakeFiles/TuProyecto.dir/clean
+CMakeFiles/MemoriaIci.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/clean
+.PHONY : CMakeFiles/MemoriaIci.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

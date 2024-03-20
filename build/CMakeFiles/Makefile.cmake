@@ -21,6 +21,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "C:/Program Files/CMake/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake"
   "C:/Program Files/CMake/share/cmake-3.28/Modules/Compiler/GNU.cmake"
   "C:/Program Files/CMake/share/cmake-3.28/Modules/FeatureSummary.cmake"
+  "C:/Program Files/CMake/share/cmake-3.28/Modules/FindOpenGL.cmake"
+  "C:/Program Files/CMake/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake"
+  "C:/Program Files/CMake/share/cmake-3.28/Modules/FindPackageMessage.cmake"
   "C:/Program Files/CMake/share/cmake-3.28/Modules/Platform/Windows-GNU-C-ABI.cmake"
   "C:/Program Files/CMake/share/cmake-3.28/Modules/Platform/Windows-GNU-C.cmake"
   "C:/Program Files/CMake/share/cmake-3.28/Modules/Platform/Windows-GNU-CXX-ABI.cmake"
@@ -61,5 +64,5 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/TuProyecto.dir/DependInfo.cmake"
+  "CMakeFiles/MemoriaIci.dir/DependInfo.cmake"
   )

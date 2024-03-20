@@ -116,24 +116,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named TuProyecto
+# Target rules for targets named MemoriaIci
 
 # Build rule for target.
-TuProyecto: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 TuProyecto
-.PHONY : TuProyecto
+MemoriaIci: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 MemoriaIci
+.PHONY : MemoriaIci
 
 # fast build rule for target.
-TuProyecto/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/build
-.PHONY : TuProyecto/fast
+MemoriaIci/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/build
+.PHONY : MemoriaIci/fast
 
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
 # target to build an object file
 src/main.cpp.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/src/main.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/src/main.cpp.obj
 .PHONY : src/main.cpp.obj
 
 src/main.i: src/main.cpp.i
@@ -141,7 +141,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -149,7 +149,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\TuProyecto.dir\build.make CMakeFiles/TuProyecto.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\MemoriaIci.dir\build.make CMakeFiles/MemoriaIci.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 # Help Target
@@ -160,7 +160,7 @@ help:
 	@echo ... depend
 	@echo ... edit_cache
 	@echo ... rebuild_cache
-	@echo ... TuProyecto
+	@echo ... MemoriaIci
 	@echo ... src/main.obj
 	@echo ... src/main.i
 	@echo ... src/main.s
