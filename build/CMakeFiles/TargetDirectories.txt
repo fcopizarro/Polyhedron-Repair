@@ -1,3 +1,0 @@
-C:/Users/fpizarro/Desktop/MemoriaICI/build/CMakeFiles/MemoriaIci.dir
-C:/Users/fpizarro/Desktop/MemoriaICI/build/CMakeFiles/edit_cache.dir
-C:/Users/fpizarro/Desktop/MemoriaICI/build/CMakeFiles/rebuild_cache.dir
