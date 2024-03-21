@@ -181,6 +181,30 @@ void drawCube(float scale) {
     glEnd();
 }
 
+// Variables globales para el movimiento de la cámara
+float zoomFactor = 1.0f; // Factor de zoom inicial
+const float zoomSpeed = 0.1f; // Velocidad de zoom
+
+// Función para manejar el evento de la rueda del ratón
+void handleMouseWheel(SDL_Event& event) {
+    // Ajustar el factor de zoom basado en la dirección de la rueda del ratón
+    if (event.wheel.y > 0) {
+        // Rueda hacia arriba: alejar la cámara
+        zoomFactor += zoomSpeed;
+    } else if (event.wheel.y < 0) {
+        // Rueda hacia abajo: acercar la cámara
+        zoomFactor -= zoomSpeed;
+    }
+    
+    // Limitar el zoom mínimo
+    if (zoomFactor < 0.1f) {
+        zoomFactor = 0.1f;
+    }
+    
+    // Aquí puedes aplicar la transformación necesaria para ajustar la cámara
+    // Por ejemplo, ajustar la matriz de proyección o de vista
+}
+
 // Dimensiones de la ventana
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 600;
@@ -250,10 +274,6 @@ int main(int argc, char* argv[]) {
      */
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity( );
-    /*
-     * EXERCISE:
-     * Replace this with a call to glFrustum.
-     */
     double ratio = (double) SCREEN_WIDTH /(double) SCREEN_HEIGHT;
     //gluPerspective( 60.0, 1.0 / ratio, 1.0, 100.0 );
     glOrtho(-1.0f, 1.0f, -1.0f / ratio, 1.0f / ratio, -1.0f, 1.0f);
@@ -300,7 +320,7 @@ int main(int argc, char* argv[]) {
     glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
 
 
-    
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     while (!quit) {
         SDL_Event e;
         // Manejo de eventos
@@ -308,7 +328,11 @@ int main(int argc, char* argv[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
+            if(e.type == SDL_MOUSEWHEEL) {
+                handleMouseWheel(e);
+            }
             rotateCameraWithMouse(e, cameraAngleX, cameraAngleY, sensitivity);
+
         }
 
         /*
@@ -352,14 +376,11 @@ int main(int argc, char* argv[]) {
             std::cerr << err << std::endl;        
         }
 
-        // Reiniciar la transformación de la vista
-        
-
-                // Mover la cámara hacia atrás para ver el cubo
 
         // Rotar la cámara según los ángulos
         glRotatef(cameraAngleX, 1.0f, 0.0f, 0.0f);
         glRotatef(cameraAngleY, 0.0f, 1.0f, 0.0f);
+        glTranslatef(0.0f, 0.0f, -zoomFactor);
 
         // Dibujar el cubo
         drawCube(scale);
