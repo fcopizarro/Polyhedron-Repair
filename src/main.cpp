@@ -1,10 +1,5 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#include <GL/glu.h>
-#include <vector>
-#include <cmath>
-
+#include "common.hpp"
+#include "Camera.hpp"
 
 class Point {
 public:
@@ -107,30 +102,6 @@ Matrix getRotationMatrix() {
     return dot(rotationZ, dot(rotationY, rotationX));
 }
 
-// Función para rotar la cámara con el mouse
-void rotateCameraWithMouse(SDL_Event& event, float& cameraAngleX, float& cameraAngleY, float sensitivity) {
-    // Manejar eventos del mouse
-    if (event.type == SDL_MOUSEMOTION) {
-        // Obtener los desplazamientos del mouse
-        int deltaX = event.motion.xrel;
-        int deltaY = event.motion.yrel;
-
-        // Aplicar sensibilidad para controlar la velocidad de rotación
-        deltaX *= sensitivity;
-        deltaY *= sensitivity;
-
-        // Actualizar los ángulos de la cámara basados en los desplazamientos del mouse
-        cameraAngleY += deltaX;
-        cameraAngleX += deltaY;
-
-        // Limitar el ángulo vertical de la cámara entre -90 y 90 grados para evitar que la cámara rote demasiado hacia arriba o hacia abajo
-        if (cameraAngleX > 90.0f) {
-            cameraAngleX = 90.0f;
-        } else if (cameraAngleX < -90.0f) {
-            cameraAngleX = -90.0f;
-        }
-    }
-}
 
 // Función para dibujar un cubo
 void drawCube(float scale) {
@@ -187,8 +158,12 @@ const int SCREEN_HEIGHT = 600;
 
 int main(int argc, char* argv[]) {
     
+    
+    Camera cam;
+
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
+
 
     // Inicializar SDL
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -196,41 +171,22 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Crear la ventana
-    window = SDL_CreateWindow("SDL VTK Viewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-    if (window == NULL) {
-        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
-        return 1;
-    }
 
-    SDL_GLContext glContext = SDL_GL_CreateContext(window);
+    
 
-    /*
-    // Crear el renderer
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-    if (renderer == NULL) {
-        std::cerr << "Error al crear el renderer: " << SDL_GetError() << std::endl;
-        return 1;
-    }*/
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
-    /*
-    glCullFace( GL_BACK );
-    glFrontFace( GL_CCW );
-    glEnable( GL_CULL_FACE );
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-    SDL_GL_SetSwapInterval(1);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(60.0, (double)SCREEN_WIDTH / (double)SCREEN_HEIGHT, 1.0, 1024.0);
-    glMatrixMode(GL_MODELVIEW);
-    glViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
-    glLoadIdentity();
-    glEnable(GL_DEPTH_TEST);
-    */
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+    SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 8);
 
+    //SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1); 
 
-
-
+    glEnable(GL_MULTISAMPLE);
     glShadeModel( GL_SMOOTH );
 
     /* Culling. */
@@ -238,8 +194,38 @@ int main(int argc, char* argv[]) {
     glFrontFace( GL_CCW );
     glEnable( GL_CULL_FACE );
 
-    /* Set the clear color. */
-    glClearColor(0.2f, 0.5f, 0.8f, 1.0f);
+    SDL_GL_SetSwapInterval(1); 
+
+
+
+    
+
+        // Crear la ventana
+    window = SDL_CreateWindow("SDL VTK Viewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
+    if (window == NULL) {
+        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+
+
+
+    SDL_GLContext glContext = SDL_GL_CreateContext(window);
+
+    if (glContext) {
+        printf("Se ha creado el contexto GL");
+    }
+
+
+    std::cerr << "Error al inicializar SDL: " << SDL_GetError() << std::endl;
+
+    
+
+    int buffers, samples;
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &buffers);
+    SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &samples);
+    printf("Multisample Buffers: %d, Multisample Samples: %d\n", buffers, samples);
+
+    
 
     /* Setup our viewport. */
     glViewport( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -262,12 +248,6 @@ int main(int argc, char* argv[]) {
     glLoadIdentity();
     
 
-    // Inicializar ángulos de cámara
-    float cameraAngleX = 0.0f;
-    float cameraAngleY = 0.0f;
-
-    // Sensibilidad del mouse
-    float sensitivity = 0.1f;
 
 
     std::vector<Point> points = {
@@ -308,7 +288,7 @@ int main(int argc, char* argv[]) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-            rotateCameraWithMouse(e, cameraAngleX, cameraAngleY, sensitivity);
+            cam.EventListener(e);
         }
 
         /*
@@ -358,8 +338,8 @@ int main(int argc, char* argv[]) {
                 // Mover la cámara hacia atrás para ver el cubo
 
         // Rotar la cámara según los ángulos
-        glRotatef(cameraAngleX, 1.0f, 0.0f, 0.0f);
-        glRotatef(cameraAngleY, 0.0f, 1.0f, 0.0f);
+        
+        cam.UpdateCamera();
 
         // Dibujar el cubo
         drawCube(scale);

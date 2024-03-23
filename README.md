@@ -13,4 +13,7 @@ pacman -S mingw-w64-x86_64-make
 
 pacman -S mingw-w64-x86_64-SDL2
 
+pacman -S mingw-w64-x86_64-glm
+
+
 
