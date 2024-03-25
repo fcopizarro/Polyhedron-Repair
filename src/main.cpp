@@ -290,10 +290,6 @@ int main(int argc, char* argv[]) {
      */
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity( );
-    /*
-     * EXERCISE:
-     * Replace this with a call to glFrustum.
-     */
     double ratio = (double) SCREEN_WIDTH /(double) SCREEN_HEIGHT;
     //gluPerspective( 60.0, 1.0 / ratio, 1.0, 100.0 );
     glOrtho(-1.0f, 1.0f, -1.0f / ratio, 1.0f / ratio, -1.0f, 1.0f);
