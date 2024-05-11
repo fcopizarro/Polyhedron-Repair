@@ -19,8 +19,17 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(src/)
 
+set(IMGUI_PATH  "deps/imgui")
+file(GLOB IMGUI_SOURCES 
+    ${IMGUI_PATH}/*.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
+    ${IMGUI_PATH}/backends/imgui_impl_sdl2.cpp
+) 
+add_library("ImGui" STATIC ${IMGUI_SOURCES})
+target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 
 
-add_executable(MemoriaIci src/main.cpp src/Camera.cpp src/common.cpp)
-target_link_libraries(MemoriaIci ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES})
+
+add_executable(MemoriaIci src/main.cpp src/Camera.cpp src/shader/Shader.cpp src/common.cpp src/models/models.cpp src/mesh/mesh.cpp)
+target_link_libraries(MemoriaIci ImGui ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_LIBRARIES} )
 
