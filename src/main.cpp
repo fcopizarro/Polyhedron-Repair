@@ -32,15 +32,11 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-
-
-
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
     if (!glContext) {
         std::cerr << "Error al crear el contexto OpenGL: " << SDL_GetError() << std::endl;
         return 1;
     }
-
     
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
@@ -54,7 +50,6 @@ int main(int argc, char* argv[])
 
     glViewport( 0, 0, width, height );
 
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -63,17 +58,25 @@ int main(int argc, char* argv[])
     ImGui_ImplSDL2_InitForOpenGL(window, glContext);
     ImGui_ImplOpenGL3_Init("#version 150");
 
-
 	// Generates Shader object using shaders default.vert and default.frag
 	Shader shader;
 
-    Model model("sphere.obj");
+    // Take care of all the light related things
+    glm::vec3 lightDir(2.0f, 2.0f, 2.0f);
+    glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
+    glm::vec3 objectColor(1.0f, 1.0f, 1.0f);
 
-	// Enables the Depth Buffer
-	glEnable(GL_DEPTH_TEST);
+	//glm::mat4 lightModel = glm::mat4(1.0f);
+	//lightModel = glm::translate(lightModel, lightPos);
 
-	// Creates camera object
+	
+
+    // Enables the Depth Buffer
+    glEnable(GL_DEPTH_TEST);
+    // Creates camera object
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+
+    Model model("sphere.obj");
 
     bool show_demo_window = true;
     bool show_another_window = false;
@@ -88,6 +91,13 @@ int main(int argc, char* argv[])
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shader.Activate();
+
+        glUniform3f(glGetUniformLocation(shader.ID, "lightDir"), lightDir.x, lightDir.y, lightDir.z);
+        glUniform3f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+        glUniform3f(glGetUniformLocation(shader.ID, "objectColor"), objectColor.x, objectColor.y, objectColor.z);
+        
+
+
 
 		// Handles camera inputs
 		//camera.Inputs(window);
@@ -144,6 +154,8 @@ int main(int argc, char* argv[])
 
 		// Updates and exports the camera matrix to the Vertex Shader
 		camera.Matrix(45.0f, 0.001f, 100.0f, shader, "camMatrix");
+
+        glUniform3f(glGetUniformLocation(shader.ID, "viewPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 
         model.Draw(shader, camera);
 

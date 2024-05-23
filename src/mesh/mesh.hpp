@@ -8,14 +8,20 @@
 class Mesh
 {
 public:
+	//std::vector <glm::vec3> vertices;
+	//std::vector <GLuint> indices;
+	//std::vector <glm::vec3> normals;
+
+	std::vector <Tri> tris;
 	std::vector <Vertex> vertices;
-	std::vector <GLuint> indices;
+
+	//std::vector <Tri> tris;
 	//std::vector <Texture> textures;
 	// Store VAO in public so it can be used in the Draw function
 	//VAO VAO;
 
 	// Initializes the mesh
-	Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices);
+	Mesh(std::vector <Vertex>& vertices, std::vector <Tri>& tris);
     //Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::vector <Texture>& textures);
 
 	// Draws the mesh
@@ -40,4 +46,7 @@ private:
     GLuint ID_VAO;
     GLuint ID_VBO;
     GLuint ID_EBO;
+	GLuint Normal_VBO;
+
+	void calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles);
 };

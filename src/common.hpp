@@ -29,8 +29,14 @@
 #include <cerrno>
 
 struct Vertex {
-    float x, y, z;
+    glm::vec3 position;
+    glm::vec3 normal;
 };
+
+struct Tri {
+    int v0, v1, v2;
+};
+
 
 struct Face {
     int v1, v2, v3;

@@ -20,16 +20,21 @@ private:
 	// Variables for easy access
 
     std::string obtenerExtension(const std::string&);
-    void read_obj(const char* file);
-    void read_vtk(const char* file);
+    void read_obj(const std::string&);
+    void read_vtk(const std::string&);
 	const char* file;
 	std::vector<unsigned char> data;
 
 	// All the meshes and transformations
 	std::vector<Mesh> meshes;
-    std::vector<Vertex> vertices;
-    std::vector<Face> tris;
+    //std::vector<glm::vec3> vertices;
+	//std::vector<Vertex> normales;
     std::vector<GLuint> tris2;
+
+	std::vector <Tri> tris;
+	std::vector <Vertex> vertices;
+
+	
 	std::vector<glm::vec3> translationsMeshes;
 	std::vector<glm::quat> rotationsMeshes;
 	std::vector<glm::vec3> scalesMeshes;

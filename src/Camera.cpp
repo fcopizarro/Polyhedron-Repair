@@ -21,9 +21,13 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
 	// Adds perspective to the scene
 	projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
 	// glm::perspective(glm::radians(mZoom), screenSize.x / screenSize.y, .001f, 1000.0f);
+	glm::mat4 model = glm::mat4(1.0f); 
 
 	// Exports the camera matrix to the Vertex Shader
-	glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view));
+	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(shader.ID, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	
 
 	
 }
@@ -116,6 +120,7 @@ void Camera::Inputs(SDL_Event& event)
 		Up = glm::normalize(glm::cross(mRightDir, Orientation));
 
 	}
+
 
 
 
