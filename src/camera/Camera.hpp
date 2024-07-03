@@ -21,6 +21,9 @@ class Camera{
         int width;
         int height;
 
+        glm::mat4 view = glm::mat4(1.0f);
+	    glm::mat4 projection = glm::mat4(1.0f);
+
         // Adjust the speed of the camera and it's sensitivity when looking around
         float speed = 0.1f;
         float sensitivity = 1.0f;
@@ -35,6 +38,10 @@ class Camera{
         void Inputs(SDL_Event&);
 
         glm::vec3 GetPosition();
+        glm::mat4 GetView();
+        glm::mat4 GetProjection();
+
+
         float getX() const { return Position.x; }
         float getY() const { return Position.y; }
         float getZ() const { return Position.z; }

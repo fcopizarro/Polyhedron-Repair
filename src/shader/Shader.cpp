@@ -39,10 +39,10 @@ GLuint Shader::loadShader(const char *shaderSource, GLenum shaderType) {
     return shaderID;
 }
 
-Shader::Shader () 
+Shader::Shader (const char* vertexFile, const char* fragmentFile ) 
 {
-    std::string vertexCode = get_file_contents("../src/shader/default/vertex.glsl");
-	std::string fragmentCode = get_file_contents("../src/shader/default/fragment.glsl");
+    std::string vertexCode = get_file_contents(vertexFile);
+	std::string fragmentCode = get_file_contents(fragmentFile);
 
     GLuint vertexShader = loadShader(vertexCode.c_str(), GL_VERTEX_SHADER);
     GLuint fragmentShader = loadShader(fragmentCode.c_str(), GL_FRAGMENT_SHADER);

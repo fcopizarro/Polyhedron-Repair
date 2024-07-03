@@ -17,7 +17,7 @@ public:
 	// Reference ID of the Shader Program
 	GLuint ID;
 	// Constructor that build the Shader Program from 2 different shaders
-	Shader();
+	Shader(const char*, const char*);
 
 	// Activates the Shader Program
 	void Activate();
