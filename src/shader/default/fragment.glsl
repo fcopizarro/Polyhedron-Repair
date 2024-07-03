@@ -22,7 +22,12 @@ void main() {
     vec3 ambient = ambientStrength * lightColor;
 
     // Propiedades difusas
+    vec3 xTangent = dFdx( viewPos );
+    vec3 yTangent = dFdy( viewPos );
+    vec3 faceNormal = normalize( cross( xTangent, yTangent ) );
+
     vec3 norm = normalize(Normal);
+
     vec3 lightDirection = normalize(-lightDir);
     float diff = max(dot(norm, lightDirection), 0.0);
     vec3 diffuse = diff * lightColor;
@@ -41,12 +46,12 @@ void main() {
     vec2 coord = gl_PointCoord;
 
     vec3 I = normalize(FragPos - viewPos);
-    vec3 R = reflect(I, normalize(Normal));
+    vec3 R = reflect(I, norm);
 
-    float intensity = max(dot(normalize(Normal), normalize(viewPos - FragPos)), 0.0);
+    float intensity = max(dot(norm, -I), 0.0);
 
     vec3 reflectionColor = vec3(1.0, 1.0, 1.0);
-    vec3 color2 = reflectionColor * intensity;
+    reflectionColor *= intensity;
 
     if (isVertex  == 3.0) // Vertice seleccionado
     {
@@ -60,6 +65,6 @@ void main() {
     } else
     {
         //FragColor = vec4(result, 1.0);
-        FragColor = vec4(color2, 1.0);
+        FragColor = vec4(reflectionColor, 1.0);
     }
 }

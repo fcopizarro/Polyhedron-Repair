@@ -64,23 +64,23 @@ bool OctreeNode::subdivide(const std::vector <Vertex> vertices, std::vector <Tri
 }
 
 // Producto cruzado
-array<float, 3> crossProduct(const array<float, 3>& a, const array<float, 3>& b) {
+std::array<float, 3> crossProduct(const std::array<float, 3>& a, const std::array<float, 3>& b) {
     return {a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]};
 }
 
 // Producto punto
-float dotProduct(const array<float, 3>& a, const array<float, 3>& b) {
+float dotProduct(const std::array<float, 3>& a, const std::array<float, 3>& b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
 // Verifica la intersección entre una línea y un triángulo
-bool edgeIntersectsTriangle(array<float, 3> p1, array<float, 3> p2, array<array<float, 3>, 3> triangle) {
-    array<float, 3> u = {triangle[1][0] - triangle[0][0], triangle[1][1] - triangle[0][1], triangle[1][2] - triangle[0][2]};
-    array<float, 3> v = {triangle[2][0] - triangle[0][0], triangle[2][1] - triangle[0][1], triangle[2][2] - triangle[0][2]};
-    array<float, 3> n = crossProduct(u, v);
+bool edgeIntersectsTriangle(std::array<float, 3> p1, std::array<float, 3> p2, std::array<std::array<float, 3>, 3> triangle) {
+    std::array<float, 3> u = {triangle[1][0] - triangle[0][0], triangle[1][1] - triangle[0][1], triangle[1][2] - triangle[0][2]};
+    std::array<float, 3> v = {triangle[2][0] - triangle[0][0], triangle[2][1] - triangle[0][1], triangle[2][2] - triangle[0][2]};
+    std::array<float, 3> n = crossProduct(u, v);
 
-    array<float, 3> dir = {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
-    array<float, 3> w0 = {p1[0] - triangle[0][0], p1[1] - triangle[0][1], p1[2] - triangle[0][2]};
+    std::array<float, 3> dir = {p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]};
+    std::array<float, 3> w0 = {p1[0] - triangle[0][0], p1[1] - triangle[0][1], p1[2] - triangle[0][2]};
     float a = -dotProduct(n, w0);
     float b = dotProduct(n, dir);
     if (fabs(b) < 1e-6) {
@@ -92,16 +92,16 @@ bool edgeIntersectsTriangle(array<float, 3> p1, array<float, 3> p2, array<array<
         return false; // No hay intersección
     }
 
-    array<float, 3> intersection = {p1[0] + r * dir[0], p1[1] + r * dir[1], p1[2] + r * dir[2]};
+    std::array<float, 3> intersection = {p1[0] + r * dir[0], p1[1] + r * dir[1], p1[2] + r * dir[2]};
 
-    array<float, 3> uu = {u[0], u[1], u[2]};
-    array<float, 3> uv = {v[0], v[1], v[2]};
-    array<float, 3> wu = {intersection[0] - triangle[0][0], intersection[1] - triangle[0][1], intersection[2] - triangle[0][2]};
-    array<float, 3> wv = {intersection[0] - triangle[2][0], intersection[1] - triangle[2][1], intersection[2] - triangle[2][2]};
-    array<float, 3> nCrossU = crossProduct(n, uu);
-    array<float, 3> nCrossV = crossProduct(n, uv);
-    array<float, 3> nCrossW = crossProduct(n, wu);
-    array<float, 3> nCrossWV = crossProduct(n, wv);
+    std::array<float, 3> uu = {u[0], u[1], u[2]};
+    std::array<float, 3> uv = {v[0], v[1], v[2]};
+    std::array<float, 3> wu = {intersection[0] - triangle[0][0], intersection[1] - triangle[0][1], intersection[2] - triangle[0][2]};
+    std::array<float, 3> wv = {intersection[0] - triangle[2][0], intersection[1] - triangle[2][1], intersection[2] - triangle[2][2]};
+    std::array<float, 3> nCrossU = crossProduct(n, uu);
+    std::array<float, 3> nCrossV = crossProduct(n, uv);
+    std::array<float, 3> nCrossW = crossProduct(n, wu);
+    std::array<float, 3> nCrossWV = crossProduct(n, wv);
 
     float denom = dotProduct(nCrossU, nCrossV);
     float s = dotProduct(nCrossW, nCrossV) / denom;
@@ -111,13 +111,16 @@ bool edgeIntersectsTriangle(array<float, 3> p1, array<float, 3> p2, array<array<
 }
 
 // Verifica si algún borde del cubo se intersecta con el triángulo
-bool checkIntersection(array<array<float, 3>, 3> triangle) {
+bool checkIntersection(std::array<std::array<float, 3>, 3> triangle) {
+    /*
     for (const auto& edge : cubeEdges) {
         if (edgeIntersectsTriangle(edge[0], edge[1], triangle)) {
             return true;
         }
     }
     return false;
+    */
+   return false;
 }
 
 

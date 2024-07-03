@@ -591,6 +591,8 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
 {   
     shader.Activate();
 
+    Draw_normals();
+
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 2);
     //silhouette();
 
@@ -632,13 +634,10 @@ void Model::silhouette()
 
 void Model::Draw_normals()
 {   
-    /*
-    // Go over all meshes and draw each one
-	for (unsigned int i = 0; i < meshes.size(); i++)
-	{
-		//meshes[i].Mesh::Draw(shader, camera, matricesMeshes[i]);
-        meshes[i].Mesh::Draw_normals();
-	}*/
+	glBindVertexArray(vaoLines);
+    glDrawArrays(GL_LINES, 0, vertices.size() * 2);
+    
+    glBindVertexArray(0);
 }
 
 
