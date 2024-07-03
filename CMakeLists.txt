@@ -19,7 +19,7 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(src/)
 
-set(IMGUI_PATH  "deps/imgui and implot")
+set(IMGUI_PATH  "deps/imgui_and_implot")
 file(GLOB IMGUI_SOURCES 
     ${IMGUI_PATH}/*.cpp
     ${IMGUI_PATH}/backends/imgui_impl_opengl3.cpp
