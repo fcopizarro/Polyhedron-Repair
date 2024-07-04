@@ -31,7 +31,7 @@ glm::vec3 getRayFromMouse(int mouseX, int mouseY, int screenWidth, int screenHei
 }
 
 
-int pickVertex(int mouseX, int mouseY, int screenWidth, int screenHeight, const glm::mat4& projection, const glm::mat4& view, std::vector <Vertex> vertices) {
+int pickVertex(int mouseX, int mouseY, int screenWidth, int screenHeight, const glm::mat4& projection, const glm::mat4& view, std::vector<std::shared_ptr<Vertex>> vertices) {
     glm::vec3 rayOrigin = glm::inverse(view)[3]; // La posición de la cámara
     glm::vec3 rayDirection = getRayFromMouse(mouseX, mouseY, screenWidth, screenHeight, projection, view);
 
@@ -40,7 +40,7 @@ int pickVertex(int mouseX, int mouseY, int screenWidth, int screenHeight, const 
     int closestIndex;
 
     for (size_t i = 0; i < vertices.size(); i += 1) {
-        glm::vec3 vertex(vertices[i].position.x, vertices[i].position.y, vertices[i].position.z);
+        glm::vec3 vertex(vertices[i]->position.x, vertices[i]->position.y, vertices[i]->position.z);
         glm::vec3 rayToPoint = vertex - rayOrigin;
         float projectionLength = glm::dot(rayToPoint, rayDirection);
         glm::vec3 projectedPoint = rayOrigin + projectionLength * rayDirection;

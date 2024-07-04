@@ -22,7 +22,7 @@ public:
 
 	void Draw_normals();
 
-	std::vector <Vertex> get_vertices();
+	std::vector<std::shared_ptr<Vertex>> get_vertices();
 	std::vector <Tri> get_tris();
 
 	std::string filename;
@@ -33,7 +33,7 @@ public:
 	Polyhedral_Mesh polyMesh;
 
 private:
-	void calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles);
+	void calculateFaceNormals(std::vector<Vertex> vertices, const std::vector<Tri>& triangles);
 	void silhouette();
 	void BindShader();
 
@@ -55,7 +55,7 @@ private:
 	std::vector<unsigned char> data;
 
 	std::vector <Tri> tris;
-	std::vector <Vertex> vertices;
+	std::vector <std::shared_ptr<Vertex>> vertices;
 
 	
 	std::vector<glm::vec3> translationsMeshes;

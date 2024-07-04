@@ -1,6 +1,6 @@
 #include "polyhedral.hpp"
 
-Polyhedral::Polyhedral(std::vector<std::shared_ptr<Vertex>>& a)
+Polyhedral::Polyhedral(std::vector<std::shared_ptr<Vertex>> a)
 {
     
 }
@@ -39,6 +39,8 @@ void Hexaedral::CalculateJ()
     // 5 -> 1 4 6
     // 6 -> 2 5 7
     // 7 -> 3 4 6
+    J.clear();
+
     glm::vec3 origin;
     glm::vec3 normalizedv1, normalizedv2, normalizedv3 ;
     
@@ -97,6 +99,7 @@ void Hexaedral::CalculateJ()
 void Hexaedral::CalculateJR() 
 {
     //std::cout << "Calculando JR" << std::endl;
+    JR.clear();
 
     float JsMax = *max_element(J.begin(), J.end());
 
@@ -188,6 +191,7 @@ void Hexaedral::CalculateAR()
 } 
 void Hexaedral::CalculateJENS()
 {
+    Jens.clear();
     // Jens = JS, con k = 1.
     Jens = J;
 }
@@ -711,6 +715,7 @@ void Polyhedral_Mesh::CalculateJ()
 {
     for (auto poly: polys)
     {
+        poly->J.clear();
         poly->CalculateJ();
         poly->CalculateJR();
         poly->CalculateAR();
@@ -848,17 +853,23 @@ void Polyhedral_Mesh::GetJ()
 }
 
 
-void Polyhedral_Mesh::FormPolys()
+void Polyhedral_Mesh::FormPolys(std::vector<std::shared_ptr<Vertex>> vertex_verdaderos) 
 {
     std::cout << "FormPolys call\nTamano types: " << types.size() << std::endl;
     for (int i = 0; i < types.size(); i++)
     {
+
+
+
         std::vector<std::shared_ptr<Vertex>> vertex_refs;
 
         for (int j = 0; j < indexs[i].size(); j++)
         {
-            vertex_refs.push_back(std::make_shared<Vertex>(vertexs[indexs[i][j]]));
+            vertex_refs.push_back(std::make_shared<Vertex>(vertex_verdaderos[indexs[i][j]]));
         }
+
+
+
 
         if (types[i] == 12)
         {
@@ -984,15 +995,14 @@ void Polyhedral_Mesh::toString()
     
 }
 
-std::vector<Vertex> Polyhedral_Mesh::toVertex()
+std::vector<std::shared_ptr<Vertex> > Polyhedral_Mesh::toVertex()
 {
-    std::vector <Vertex> converted;
+    std::vector<std::shared_ptr<Vertex> > converted;
 
 
     for (glm::vec3 ver_: vertexs)
     {
-        Vertex ver = { ver_, glm::vec3(0.0f), glm::vec3(0.5f)};
-        converted.push_back(ver);
+        converted.push_back(std::make_shared<Vertex>(ver_, glm::vec3(0.0f), glm::vec3(0.5f)));
     }
     
 
@@ -1028,17 +1038,17 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
             converted.push_back({indexs[i][0], indexs[i][2], indexs[i][1]});
             converted.push_back({indexs[i][0], indexs[i][3], indexs[i][2]});
             
-            converted.push_back({indexs[i][0], indexs[i][1], indexs[i][4]});
+            converted.push_back({indexs[i][1], indexs[i][4], indexs[i][0]});
             converted.push_back({indexs[i][1], indexs[i][5], indexs[i][4]});
 
-            converted.push_back({indexs[i][0], indexs[i][4], indexs[i][3]});
+            converted.push_back({indexs[i][3], indexs[i][0], indexs[i][4]});
             converted.push_back({indexs[i][3], indexs[i][4], indexs[i][7]});
             
             converted.push_back({indexs[i][4], indexs[i][5], indexs[i][6]});
             converted.push_back({indexs[i][4], indexs[i][6], indexs[i][7]});
 
-            converted.push_back({indexs[i][1], indexs[i][2], indexs[i][5]});
-            converted.push_back({indexs[i][2], indexs[i][6], indexs[i][5]});
+            converted.push_back({indexs[i][5], indexs[i][1], indexs[i][2]});
+            converted.push_back({indexs[i][5], indexs[i][2], indexs[i][6]});
 
             converted.push_back({indexs[i][2], indexs[i][3], indexs[i][7]});
             converted.push_back({indexs[i][2], indexs[i][7], indexs[i][6]});

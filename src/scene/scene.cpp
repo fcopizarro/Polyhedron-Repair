@@ -33,9 +33,9 @@ void Scene::Update(Shader& shader, UI& ui)
 
     camera->Matrix(45.0f, 0.001f, 100.0f, shader, "camMatrix");
 
-    glUniform3f(glGetUniformLocation(shader.ID, "viewPos"), camera->Position.x, camera->Position.y, camera->Position.z);
+    glUniform3f(glGetUniformLocation(shader.ID, "viewPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
 
-    GraphAxis( shader);
+    //GraphAxis( shader);
 
     if (ui.createOctree)
     {
@@ -61,6 +61,8 @@ void Scene::Update(Shader& shader, UI& ui)
         ui.qtyPrism = model->polyMesh.qtyPrism;
         ui.qtyPyra = model->polyMesh.qtyPyra;
         ui.qtyTetra = model->polyMesh.qtyTetra;
+
+        camera->cameraTarget = glm::vec3( (model->boundary.min.x + model->boundary.max.x) / 2.0f, (model->boundary.min.y + model->boundary.max.y) / 2.0f, (model->boundary.min.z + model->boundary.max.z) / 2.0f  );
     }
 
     if(ui.includeHexa != model->polyMesh.includeHexa 

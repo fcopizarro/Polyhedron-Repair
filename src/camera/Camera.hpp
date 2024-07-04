@@ -14,6 +14,15 @@ class Camera{
         glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
         glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
+        glm::vec3 cameraPos;
+        glm::vec3 cameraTarget;
+        glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+        float radius = 10.0f;  // Distancia de la cámara al centro del objeto
+        float azimuth = 0.0f;  // Ángulo azimutal (horizontal)
+        float elevation = 0.0f;  // Ángulo de elevación (vertical)
+
+        bool centerCameraActivated = true;
+
         // Prevents the camera from jumping around when first clicking left click
         bool firstClick = true;
 

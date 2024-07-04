@@ -22,7 +22,7 @@ public:
     virtual void CalculateEQ(){}
     virtual void CalculateAREN(){}
 
-    Polyhedral(std::vector<std::shared_ptr<Vertex>>&);
+    Polyhedral(std::vector<std::shared_ptr<Vertex>>);
     void GiveColor(glm::vec3, glm::vec3);
 };
 
@@ -95,22 +95,26 @@ public:
 class Polyhedral_Mesh
 {
 private:
-    std::vector <glm::vec3> vertexs;
+    std::vector <glm::vec3> shader_vertexs;
     std::vector <int> types;
     std::vector <std::vector <int>> indexs; 
     
 public:
+    std::vector <glm::vec3> vertexs;
+
+
+
     std::vector <std::shared_ptr<Polyhedral>> polys;
     Polyhedral_Mesh(/* args */);
     void PushVertex(glm::vec3);
     void PushType(int);
     void PushIndex(std::vector<int>);
     void toString();
-    void FormPolys();
+    void FormPolys(std::vector<std::shared_ptr<Vertex>>) ;
     void CalculateJ();
     void GetJ();
 
-    std::vector<Vertex> toVertex();
+    std::vector<std::shared_ptr<Vertex> > toVertex();
     std::vector<Tri> toTris();
 
     bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;

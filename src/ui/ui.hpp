@@ -30,7 +30,7 @@ public:
     void Destroy();
 
     int closestIndex = -1;
-    std::vector <Vertex> vertice;
+    std::vector<std::shared_ptr<Vertex>> vertice;
     bool createOctree = false;
     bool editMode = false;
 

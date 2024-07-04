@@ -321,6 +321,7 @@ UI::UI (const unsigned int width,const unsigned int height)
 
     glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
     
+    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
 }
 
@@ -455,12 +456,42 @@ void UI::EditVertexMenu(Model& model)
         {
             ImGui::Text("Vertice seleccionado");
 
-            float vec4a[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
-            float bef[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
+            float vec4a[3] = {vertice[closestIndex]->position.x, vertice[closestIndex]->position.y, vertice[closestIndex]->position.z};
+            float bef[3] = {vertice[closestIndex]->position.x, vertice[closestIndex]->position.y, vertice[closestIndex]->position.z};
             ImGui::InputFloat3("Posicion x, y , z", vec4a);
 
+
+
+            glm::vec3 tempvec = model.get_vertices()[closestIndex]->position;
+            ImGui::Text("Version Model %.2f %.2f %.2f", tempvec.x, tempvec.y, tempvec.z);
+            ImGui::Text("Version UI %.2f %.2f %.2f", vertice[closestIndex]->position.x, vertice[closestIndex]->position.y, vertice[closestIndex]->position.z);
+            ImGui::Text("Version Poly %.2f %.2f %.2f", model.polyMesh.vertexs[closestIndex].x, model.polyMesh.vertexs[closestIndex].y, model.polyMesh.vertexs[closestIndex].z);
+
+
+
             if (bef[0] != vec4a[0] || bef[1] != vec4a[1] || bef[2] != vec4a[2] )
+                {
                 model.setVertexPosition(closestIndex, vec4a[0], vec4a[1], vec4a[2]);
+                model.polyMesh.CalculateJ();
+                model.polyMesh.GetJ();
+                histogramData.clear();
+                std::cout << " Cmbiasdiasdfjasdf    ";
+                for (auto J_: model.polyMesh.Jtotal)
+                {   
+                    std::cout << J_ << "  ";
+                }
+                std::cout << std::endl;
+                histogramData = model.polyMesh.Jtotal;
+                Jdata = model.polyMesh.Jdata;
+                JRdata = model.polyMesh.JRdata;
+                JENSdata = model.polyMesh.JENSdata;
+                EQdata = model.polyMesh.EQdata;
+
+                ARtotal = model.polyMesh.ARtotal;
+                ARdata = model.polyMesh.ARdata;
+                ARGdata = model.polyMesh.ARGdata;
+                ARENdata = model.polyMesh.ARENdata;
+                }
 
         } else {
             ImGui::Text("No se ha seleccionado un vertice.");

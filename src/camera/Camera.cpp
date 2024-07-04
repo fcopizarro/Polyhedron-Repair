@@ -7,10 +7,27 @@ Camera::Camera(int width, int height, glm::vec3 position)
 	Position = position;
 	mYaw = DefaultYaw;
 	mPitch = DefaultPitch;
+
+	cameraTarget = glm::vec3(0.0f);
 }
 
 void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shader, const char* uniform)
 {
+	if (centerCameraActivated)
+	{
+		view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+    	projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.1f, 100.0f);
+
+		    // Convertir ángulos a radianes
+		float azimuthRad = glm::radians(azimuth);
+		float elevationRad = glm::radians(elevation);
+
+		// Calcular la posición de la cámara en coordenadas esféricas
+		cameraPos.x = radius * cos(elevationRad) * cos(azimuthRad);
+		cameraPos.y = radius * sin(elevationRad);
+		cameraPos.z = radius * cos(elevationRad) * sin(azimuthRad);
+
+	} else {
 	// Initializes matrices since otherwise they will be the null matrix
 
 	// Makes camera look in the right direction from the right position
@@ -19,6 +36,9 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
 	// Adds perspective to the scene
 	projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
 	// glm::perspective(glm::radians(mZoom), screenSize.x / screenSize.y, .001f, 1000.0f);
+	
+	}
+
 	glm::mat4 model = glm::mat4(1.0f); 
 
 	// Exports the camera matrix to the Vertex Shader
@@ -83,6 +103,14 @@ void Camera::Inputs(SDL_Event& event)
         }
     }
 
+	if (event.type == SDL_MOUSEWHEEL )
+	{
+		if (event.wheel.y > 0) 
+			radius -= 0.5f;
+		if (event.wheel.y < 0) 
+			radius += 0.5f;
+	}
+
 	
 	if (event.type == SDL_MOUSEBUTTONDOWN) {
 		if (event.button.button == SDL_BUTTON_MIDDLE) {
@@ -116,9 +144,16 @@ void Camera::Inputs(SDL_Event& event)
 
 		int deltaX = event.motion.xrel;
 		int deltaY = event.motion.yrel;
-		mYaw += deltaX * sensitivity;
-		mPitch += deltaY * sensitivity;
+		azimuth += deltaX * sensitivity;
+		elevation += deltaY * sensitivity;
 
+		 if (elevation > 89.0f)
+        elevation = 89.0f;
+   		 if (elevation < -89.0f)
+        elevation = -89.0f;
+
+
+		/*
 		const float radPitch{ glm::radians(mPitch) };
 		const float radYaw{ glm::radians(mYaw) };
 		const glm::vec3 front{
@@ -129,6 +164,10 @@ void Camera::Inputs(SDL_Event& event)
 		Orientation = glm::normalize(front);
 		mRightDir = glm::normalize(glm::cross(Orientation, Up));
 		Up = glm::normalize(glm::cross(mRightDir, Orientation));
+
+		*/
+
+
 
 	}
 

@@ -34,14 +34,14 @@ Model::Model(const OctreeNode* octree, glm::vec3 color)
 
         int index_ = vertices.size();
 
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color});
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.min.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.min.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.min.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.max.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.min.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.max.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.max.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color));
+        vertices.push_back(std::make_shared<Vertex>( glm::vec3(bb_.max.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color));
 
 
         tris.push_back({index_, index_ + 1, index_ + 2});
@@ -83,6 +83,7 @@ Model::Model(const std::string& file_, glm::vec3 color)
     } else if (model_ext == "vtk")
     {
         read_vtk(filename, color);
+        boundary = BoundingBox(min, max);
     }
     else
     {
@@ -101,15 +102,19 @@ Model::Model(const std::string& file_, glm::vec3 color)
 
 void Model::BindShader()
 {
+    std::vector<Vertex> vertexData;
+    for (const auto& vertex : vertices) {
+        vertexData.push_back(*vertex);
+    }
 
-    calculateFaceNormals(vertices, tris);
+    calculateFaceNormals(vertexData, tris);
 
     glGenVertexArrays(1, &ID_VAO);
     glBindVertexArray(ID_VAO);
 
     glGenBuffers(1, &ID_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, ID_VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vertex), vertexData.data(), GL_DYNAMIC_DRAW);
 
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
@@ -138,7 +143,7 @@ void Model::BindShader()
 }
 
 
-void Model::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles)
+void Model::calculateFaceNormals(std::vector<Vertex> vertices, const std::vector<Tri>& triangles)
 {
 
     for (const auto& triangle : triangles) {
@@ -178,11 +183,12 @@ std::string Model::obtenerExtension(const std::string& nombreArchivo) {
 
 void Model::setVertexPosition(int index, float x, float y, float z)
 {
-    vertices[index].position = glm::vec3(x, y, z);
+    vertices[index]->position.x = x;
+    vertices[index]->position.y = y;
+    vertices[index]->position.z = z;
 
     glBindBuffer(GL_ARRAY_BUFFER, ID_VBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
-
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
     glEnableVertexAttribArray(0);
@@ -194,7 +200,7 @@ void Model::setVertexPosition(int index, float x, float y, float z)
 
 }
 
-std::vector <Vertex> Model::get_vertices()
+std::vector<std::shared_ptr<Vertex>> Model::get_vertices()
 {
     return vertices;
 }
@@ -256,7 +262,7 @@ void Model::read_obj(const std::string& filename, glm::vec3 color)
 
                 Vertex ver = { glm::vec3(x, y, z), glm::vec3(0.0f), color};
 
-                vertices.push_back(ver);
+                vertices.push_back(std::make_shared<Vertex>(ver));
 
 
             } else if (token == "f") {
@@ -339,6 +345,15 @@ void Model::read_obj(const std::string& filename, glm::vec3 color)
 
 void Model::read_vtk(const std::string& filename, glm::vec3 color)
 {
+
+    
+    float min_value = std::numeric_limits<float>::lowest();
+    float max_value = std::numeric_limits<float>::max();
+
+    glm::vec3 min_ (max_value, max_value, max_value);
+    glm::vec3 max_ (min_value, min_value, min_value);
+
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
@@ -446,9 +461,14 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
     int init = 0;
     for (int i = 0; i < points_num; i += 1)
     {
+        updateMinMax(min_, max_, temp[init], temp[init+1], temp[init+2]);
+        //vertices.push_back( std::make_shared<Vertex>(glm::vec3(temp[init], temp[init+1], temp[init+2]), glm::vec3(0.0f), glm::vec3(0.5f)));
         polyMesh.PushVertex(glm::vec3(temp[init], temp[init+1], temp[init+2]));
         init +=3;
     }
+
+    min = min_;
+    max = max_;
     
 
 
@@ -551,35 +571,21 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
     // ------------------------ DATOS EXTRAIDOS ------------------------
 
 
+    vertices = polyMesh.toVertex();
 
-    polyMesh.FormPolys();
+    polyMesh.FormPolys(vertices);
     polyMesh.CalculateJ();
     polyMesh.GetJ();
     polyMesh.toString(); 
 
-    vertices = polyMesh.toVertex();
     tris = polyMesh.toTris();
 
     std::cout << "VER" << vertices.size() << "\n TRI" << tris.size() << std::endl;
-    std::cout << vertices[0].position.x << " " << vertices[0].position.y << " " << vertices[0].position.z << std::endl;
-    std::cout << vertices[1].position.x << " " << vertices[1].position.y << " " << vertices[1].position.z << std::endl;
+    std::cout << vertices[0]->position.x << " " << vertices[0]->position.y << " " << vertices[0]->position.z << std::endl;
+    std::cout << vertices[1]->position.x << " " << vertices[1]->position.y << " " << vertices[1]->position.z << std::endl;
 
     std::cout << tris[0].v0 << " " << tris[0].v1 << " " << tris[0].v2 << std::endl;
 
-
-
-
-
-    
-
-
-
-
-
-
-
-
-    
 
     
 
@@ -591,10 +597,16 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
 {   
     shader.Activate();
 
-    Draw_normals();
+    //Draw_normals();
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 2);
     //silhouette();
+    /*
+    glBindVertexArray(ID_VAO);
+    glLineWidth(10.0f);
+    glDrawElements(GL_LINES, 8, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    */
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 0);
 
@@ -625,6 +637,8 @@ void Model::silhouette()
     glLineWidth(2.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glDrawElements(GL_TRIANGLES, tris.size() * 3, GL_UNSIGNED_INT, 0);
+
+    
     glPolygonMode(GL_FRONT, GL_FILL);
     glLineWidth(1.0f);
 

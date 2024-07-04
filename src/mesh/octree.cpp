@@ -1,6 +1,6 @@
 #include "octree.hpp"
 
-bool OctreeNode::subdivide(const std::vector <Vertex> vertices, std::vector <Tri> tris)
+bool OctreeNode::subdivide(const std::vector<std::shared_ptr<Vertex>> vertices, std::vector <Tri> tris)
 {
     // Subdividir si o si a un nivel
     // TODO: subdividir solo si el bounding box resultante es distinto al padre.
@@ -206,14 +206,14 @@ bool OctreeNode::cohenSutherlandClip(float x1, float y1, float z1, float x2, flo
 }
 
 // Verifica si algún borde del triángulo se intersecta con el cubo
-bool OctreeNode::checkTriangleIntersection(std::vector <Vertex> vertices, std::vector <Tri> tris) {
+bool OctreeNode::checkTriangleIntersection(std::vector<std::shared_ptr<Vertex>> vertices, std::vector <Tri> tris) {
 
 
     for(auto tri: tris)
     {
-        glm::vec3 v0 = vertices[tri.v0].position;
-        glm::vec3 v1 = vertices[tri.v1].position;
-        glm::vec3 v2 = vertices[tri.v2].position;
+        glm::vec3 v0 = vertices[tri.v0]->position;
+        glm::vec3 v1 = vertices[tri.v1]->position;
+        glm::vec3 v2 = vertices[tri.v2]->position;
 
 
         if(cohenSutherlandClip(v0.x, v0.y, v0.z, v1.x, v1.y, v1.z))
@@ -236,7 +236,7 @@ bool OctreeNode::checkTriangleIntersection(std::vector <Vertex> vertices, std::v
 
 
 
-bool OctreeNode::is_divisible(std::vector <Vertex> vertices, std::vector <Tri> tris)
+bool OctreeNode::is_divisible(std::vector<std::shared_ptr<Vertex>> vertices, std::vector <Tri> tris)
 {
 
 

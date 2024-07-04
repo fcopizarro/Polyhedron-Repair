@@ -22,16 +22,16 @@ public:
     OctreeNode(const BoundingBox& boundary, int depth, int max_depth)
         : boundary(boundary), depth(depth), max_depth(max_depth), divided(false), to_convert(false) {}
 
-    bool subdivide(const std::vector <Vertex>, std::vector <Tri>);
+    bool subdivide(const std::vector<std::shared_ptr<Vertex>>, std::vector <Tri>);
 
     int computeRegionCode(float x, float y, float z);
     bool cohenSutherlandClip(float x1, float y1, float z1, float x2, float y2, float z2);
-    bool checkTriangleIntersection(std::vector <Vertex> vertices, std::vector <Tri> tris);
+    bool checkTriangleIntersection(std::vector<std::shared_ptr<Vertex>> vertices, std::vector <Tri> tris);
 
 
 private:
 
-    bool is_divisible(std::vector <Vertex>, std::vector <Tri>);
+    bool is_divisible(std::vector<std::shared_ptr<Vertex>>, std::vector <Tri>);
     
 };
 

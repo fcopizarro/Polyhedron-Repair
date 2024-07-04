@@ -1,6 +1,6 @@
 #version 330 core
 
-in vec3 Normal;  // Normal del fragmento
+flat in vec3 Normal;  // Normal del fragmento
 in vec3 FragPos; // Posición del fragmento
 in vec3 Color;
 flat in float vType;
@@ -65,6 +65,6 @@ void main() {
     } else
     {
         //FragColor = vec4(result, 1.0);
-        FragColor = vec4(reflectionColor, 1.0);
+        FragColor = vec4(reflectionColor + vec3(0.3,0.3,0.3), 1.0);
     }
 }

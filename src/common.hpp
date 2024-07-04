@@ -45,6 +45,9 @@ struct Vertex {
     Vertex(glm::vec3 position, glm::vec3 normal, glm::vec3 color) : position(position), normal(normal), color(color) {}
     Vertex(glm::vec3 position, glm::vec3 normal) : position(position), normal(normal) {}
     Vertex(glm::vec3 position) : position(position) {}
+
+    Vertex(std::shared_ptr<Vertex> other)
+        : position(other->position), normal(other->normal), color(other->color) {}
 };
 
 struct Tri {
