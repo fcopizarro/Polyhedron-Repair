@@ -83,6 +83,7 @@ Model::Model(const std::string& file_, glm::vec3 color)
     } else if (model_ext == "vtk")
     {
         read_vtk(filename, color);
+        boundary = BoundingBox(min, max);
     }
     else
     {
@@ -135,6 +136,9 @@ void Model::BindShader()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    renderNormals(vertices);
+    BindMeshLines();
 }
 
 
@@ -192,6 +196,22 @@ void Model::setVertexPosition(int index, float x, float y, float z)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+}
+
+void Model::UpdateModelGraph()
+{
+    
+    glBindBuffer(GL_ARRAY_BUFFER, ID_VBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(Vertex), vertices.data());
+
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid *)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 std::vector <Vertex> Model::get_vertices()
@@ -339,6 +359,14 @@ void Model::read_obj(const std::string& filename, glm::vec3 color)
 
 void Model::read_vtk(const std::string& filename, glm::vec3 color)
 {
+
+    float min_value = std::numeric_limits<float>::lowest();
+    float max_value = std::numeric_limits<float>::max();
+
+    glm::vec3 min_ (max_value, max_value, max_value);
+    glm::vec3 max_ (min_value, min_value, min_value);
+
+
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
@@ -446,10 +474,14 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
     int init = 0;
     for (int i = 0; i < points_num; i += 1)
     {
+        vertices.push_back({ glm::vec3(temp[init], temp[init+1], temp[init+2]), glm::vec3(0.0f), glm::vec3(0.5f)});
+        updateMinMax(min_, max_, temp[init], temp[init+1], temp[init+2]);
         polyMesh.PushVertex(glm::vec3(temp[init], temp[init+1], temp[init+2]));
         init +=3;
     }
     
+    min = min_;
+    max = max_;
 
 
 
@@ -552,12 +584,12 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
 
 
 
-    polyMesh.FormPolys();
+    polyMesh.FormPolys(vertices);
     polyMesh.CalculateJ();
     polyMesh.GetJ();
     polyMesh.toString(); 
 
-    vertices = polyMesh.toVertex();
+    //vertices = polyMesh.toVertex();
     tris = polyMesh.toTris();
 
     std::cout << "VER" << vertices.size() << "\n TRI" << tris.size() << std::endl;
@@ -591,9 +623,11 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
 {   
     shader.Activate();
 
-    Draw_normals();
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 2);
+    Draw_normals();
+    DrawMeshLines();
+
     //silhouette();
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 0);
@@ -631,11 +665,233 @@ void Model::silhouette()
     glBindVertexArray(0);
 }
 
+void Model::renderNormals(const std::vector<Vertex>& vertices) {
+    
+    std::vector<glm::vec3> lineVertices;
+    for (const auto& vertex : vertices) {
+        lineVertices.push_back(vertex.position);
+        lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+    }
+
+    glGenVertexArrays(1, &vaoLines);
+    glBindVertexArray(vaoLines);
+
+    
+
+    glGenBuffers(1, &vboLineVertices);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboLineVertices);
+
+    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
+
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+
+
+    glBindVertexArray(0); // Desenlazar VAO
+}
+
+void Model::updateNormals() {
+    std::vector<glm::vec3> lineVertices;
+    for (const auto& vertex : vertices) {
+        lineVertices.push_back(vertex.position);
+        lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+    }
+
+    glBindVertexArray(vaoLines);
+    glBindBuffer(GL_ARRAY_BUFFER, vboLineVertices);
+    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
+    glBindVertexArray(0); // Desenlazar VAO
+}
+
 
 void Model::Draw_normals()
 {   
 	glBindVertexArray(vaoLines);
     glDrawArrays(GL_LINES, 0, vertices.size() * 2);
+    
+    glBindVertexArray(0);
+}
+
+void Model::BindMeshLines()
+{
+    std::vector<glm::vec3> lineVertices;
+    
+    for (auto poly : polyMesh.polys) {
+
+        if (std::dynamic_pointer_cast<Hexaedral>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+        }
+        else if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+        }
+        //lineVertices.push_back(vertex.position);
+        //lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+    }
+
+    glGenVertexArrays(1, &vaoMeshLines);
+    glBindVertexArray(vaoMeshLines);
+
+    
+
+    glGenBuffers(1, &vboMeshLines);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboMeshLines);
+
+    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
+
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+
+
+    glBindVertexArray(0); // Desenlazar VAO
+}
+
+void Model::UpdateMeshLines()
+{
+    std::vector<glm::vec3> lineVertices;
+    
+    for (auto poly : polyMesh.polys) {
+
+        if (std::dynamic_pointer_cast<Hexaedral>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+        }
+        else if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+        }
+        //lineVertices.push_back(vertex.position);
+        //lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+    }
+    
+    glBindVertexArray(vaoMeshLines);
+    glBindBuffer(GL_ARRAY_BUFFER, vboMeshLines);
+    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+    glBindVertexArray(0); // Desenlazar VAO
+
+    
+    
+}
+
+void Model::DrawMeshLines()
+{
+    glBindVertexArray(vaoMeshLines);
+    glLineWidth(3.0f);
+    glDrawArrays(GL_LINES, 0, 
+                                vertices.size() * 12 * polyMesh.qtyHexa // Hexaedro 
+                                + vertices.size() * 6 * polyMesh.qtyTetra      //Tetrahedro
+                                + 0
+                                + 0
+    );
     
     glBindVertexArray(0);
 }

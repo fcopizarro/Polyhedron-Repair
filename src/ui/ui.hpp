@@ -26,6 +26,7 @@ public:
     void NormalsMenu();
     void EditVertexMenu(Model&);
     void HistogramMenu();
+    void FixMenu(Model& );
 
     void Destroy();
 

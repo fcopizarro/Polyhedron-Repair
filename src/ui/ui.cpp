@@ -321,6 +321,7 @@ UI::UI (const unsigned int width,const unsigned int height)
 
     glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
     
+    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
 
 }
 
@@ -335,6 +336,7 @@ void UI::Update(Model& model)
     NormalsMenu();
 
     EditVertexMenu(model);
+    FixMenu(model);
 
 
 
@@ -376,7 +378,7 @@ void UI::MainMenu()
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
     
 
-    ImGui::Checkbox("Normales", &show_another_window);
+    //ImGui::Checkbox("Normales", &show_another_window);
 
     /*
     static int listbox_item_current = 0;
@@ -453,14 +455,39 @@ void UI::EditVertexMenu(Model& model)
         
         if (closestIndex != -1)
         {
-            ImGui::Text("Vertice seleccionado");
+            ImGui::Text("Vertice seleccionado %i", closestIndex );
 
             float vec4a[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
             float bef[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
-            ImGui::InputFloat3("Posicion x, y , z", vec4a);
+            ImGui::InputFloat3("Posicion x, y , z", vec4a, "%.3f",  ImGuiInputTextFlags_EnterReturnsTrue);
 
             if (bef[0] != vec4a[0] || bef[1] != vec4a[1] || bef[2] != vec4a[2] )
+             {
                 model.setVertexPosition(closestIndex, vec4a[0], vec4a[1], vec4a[2]);
+                model.updateNormals();
+                model.UpdateMeshLines();
+                model.polyMesh.CalculateJ();
+                model.polyMesh.GetJ();
+                histogramData.clear();
+                /*
+                std::cout << " Cmbiasdiasdfjasdf    ";
+                for (auto J_: model.polyMesh.Jtotal)
+                {   
+                    std::cout << J_ << "  ";
+                }
+                */
+                std::cout << std::endl;
+                histogramData = model.polyMesh.Jtotal;
+                Jdata = model.polyMesh.Jdata;
+                JRdata = model.polyMesh.JRdata;
+                JENSdata = model.polyMesh.JENSdata;
+                EQdata = model.polyMesh.EQdata;
+
+                ARtotal = model.polyMesh.ARtotal;
+                ARdata = model.polyMesh.ARdata;
+                ARGdata = model.polyMesh.ARGdata;
+                ARENdata = model.polyMesh.ARENdata;
+                }
 
         } else {
             ImGui::Text("No se ha seleccionado un vertice.");
@@ -482,6 +509,47 @@ void UI::NormalsMenu()
 
             ImGui::End();
         }
+
+}
+
+void UI::FixMenu(Model& model) 
+{
+    static float Jscale = 0.0f;
+    ImGui::Begin("Menu Fix");   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+    //ImGui::Checkbox("Visualizarlas", &show_normals);
+    //ImGui::SliderFloat("float", &normal_scale, 0.0f, 10.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+    //ImGui::ColorEdit3("clear color", (float*)&normals_color);
+    ImGui::SliderFloat("float", &Jscale, -1.0f, 1.0f);
+    if (ImGui::Button("FixJ"))
+    {
+        model.polyMesh.FixJ(Jscale, 1);    
+        model.UpdateModelGraph();
+        model.UpdateMeshLines();
+        model.updateNormals();
+
+        model.polyMesh.CalculateJ();
+        model.polyMesh.GetJ();
+        histogramData.clear();
+        /*
+        std::cout << " Cmbiasdiasdfjasdf    ";
+        for (auto J_: model.polyMesh.Jtotal)
+        {   
+            std::cout << J_ << "  ";
+        }
+        */
+        std::cout << std::endl;
+        histogramData = model.polyMesh.Jtotal;
+        Jdata = model.polyMesh.Jdata;
+        JRdata = model.polyMesh.JRdata;
+        JENSdata = model.polyMesh.JENSdata;
+        EQdata = model.polyMesh.EQdata;
+
+        ARtotal = model.polyMesh.ARtotal;
+        ARdata = model.polyMesh.ARdata;
+        ARGdata = model.polyMesh.ARGdata;
+        ARENdata = model.polyMesh.ARENdata;
+    }    
+    ImGui::End();
 
 }
 

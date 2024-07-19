@@ -1,6 +1,6 @@
 #include "polyhedral.hpp"
 
-Polyhedral::Polyhedral(std::vector<std::shared_ptr<Vertex>>& a)
+Polyhedral::Polyhedral(const std::vector<Vertex*>& a)
 {
     
 }
@@ -22,10 +22,52 @@ void Polyhedral::GiveColor(glm::vec3 color1, glm::vec3 color2)
 }
 
 
-Hexaedral::Hexaedral(std::vector<std::shared_ptr<Vertex>>& vasad) : Polyhedral(vasad)
+Hexaedral::Hexaedral(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 {
     vertexs_refs = vasad;
 }
+
+std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
+{
+    switch (index)
+    {
+    case 0:
+        return {1, 3, 4};
+        break;
+    case 1:
+        return {0, 5, 2};
+    case 2:
+        return {1, 6, 3};
+    case 3:
+        return {0, 2, 7};
+    case 4:
+        return {0, 7, 5};
+    case 5:
+        return {1, 4, 6};
+    case 6:
+        return {2, 5, 7};
+    case 7:
+        return {3, 6, 4};
+    default:
+        return {0, 0, 0};
+    }
+
+}
+std::tuple<int, int, int> Tetrahedra::GetAdjs (int index)
+{
+    switch (index)
+    {
+    default:
+        return {0, 0, 0};
+    }
+
+}
+std::tuple<int, int, int> Prism::GetAdjs (int index) {return {0, 0, 0};}
+std::tuple<int, int, int> Pyramid::GetAdjs (int index)
+{
+    return {0,0,0};
+}
+
 void Hexaedral::CalculateJ() 
 {
     //std::cout << "Calculando J" << std::endl;
@@ -223,7 +265,7 @@ void Hexaedral::CalculateAREN()
     ARen = AR;
 }
 
-Tetrahedra::Tetrahedra(std::vector<std::shared_ptr<Vertex>>& vasad) : Polyhedral(vasad)
+Tetrahedra::Tetrahedra(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 {
     vertexs_refs = vasad;
 }
@@ -374,7 +416,7 @@ void Tetrahedra::CalculateAREN()
     ARen = AR;
 }
 
-Pyramid::Pyramid(std::vector<std::shared_ptr<Vertex>>& vasad) : Polyhedral(vasad)
+Pyramid::Pyramid(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 {
     vertexs_refs = vasad;
 }
@@ -441,6 +483,195 @@ void Pyramid::CalculateJ()
     float min_ele = *min_element(values_gauss.begin(), values_gauss.end());
     J.push_back(min_ele);
 }
+
+void Polyhedral_Mesh::FixJ(float minJ, int maxtrys)
+{
+    for (auto poly: polys)
+    {
+        poly->FixJ(minJ, maxtrys);
+    }
+}
+
+glm::vec3 Polyhedral::GenerateRandomMove()
+{
+    std::random_device rd;  // Utilizado para obtener una semilla para el generador de números aleatorios
+    std::mt19937 gen(rd()); // Generador de números aleatorios Mersenne Twister
+    std::uniform_real_distribution<> dis(-1.0f, 1.0f); // Distribución uniforme en el rango [min, max]
+
+    float x = dis(gen);
+    float y = dis(gen);
+    float z = dis(gen);
+
+    return glm::normalize(glm::vec3(x, y, z));
+}
+
+float Polyhedral::SimulateJ(glm::vec3 new_vertex)
+{
+    return 0.0f;
+}
+
+
+
+bool Polyhedral::EasyFix(float t) // t: umbral
+{
+    // Conseguir todos los vertices bajo el umbral
+    std::vector <int> indexs_to_fix;
+    for (int i = 0; i < J.size(); i++)
+    {
+        if (J[i] < t)
+            indexs_to_fix.push_back(i);
+    }
+
+    int actual_try = 0;
+
+    // Iterar sobre todos estos vertices
+    for (int i = 0; i < indexs_to_fix.size(); i++)
+    {
+        bool fixed = false;
+
+        while(!fixed)
+        {
+            
+            glm::vec3 mov = GenerateRandomMove();
+            //GetJforActualmov;
+
+            // Si alcanza el umbral T:
+            //      pasar al sgte vertice
+            /*
+            if (actualJ > t)
+            {
+                fixed = true;
+                // Mover vertice de indice a la posicion nueva.
+                // Pasar al sgte vertice
+            } 
+            
+            // Si no:
+            else {
+                
+                //      Si mejora con respecto al valor anterior:
+                //          Mover hacia el nuevo punto
+                if (actualJ > J[indexs_to_fix[i]])
+                {
+
+                }
+                
+                //      Si no:
+                //          Aumentar intento ++
+                else
+                    actual_try++;
+                
+
+            }
+
+            // Si se ha alcanzado el numero de intentos maximo:
+            // Retornar false
+            if(actual_try == maxtry)
+                return false;
+            */
+        }
+        
+    }
+
+    return true;
+    
+    
+
+    
+
+
+}
+
+bool Polyhedral::FixJ(float minJ, int maxtrys)
+{
+    int actual_try = 0;
+    while (actual_try < maxtrys)
+    {
+        bool fix_needed = false;
+
+        for (int i = 0; i < J.size(); i++)
+        {
+            if (J[i] < minJ) // TODO:  || J[i] < 0) // Fix si o si
+            {
+                
+                if (dynamic_cast<Hexaedral*>(this))
+                {
+                    int index_1, index_2, index_3;
+
+                    if (i == 0){
+                        index_1 = 1;
+                        index_2 = 3;
+                        index_3 = 4;
+                    } else if (i == 1){
+                        index_1 = 0;
+                        index_2 = 5;
+                        index_3 = 2;
+                    } else if (i == 2){
+                        index_1 = 1;
+                        index_2 = 6;
+                        index_3 = 3;
+                    } else if (i == 3){
+                        index_1 = 0;
+                        index_2 = 2;
+                        index_3 = 7;
+                    } else if (i == 4){
+                        index_1 = 0;
+                        index_2 = 7;
+                        index_3 = 5;
+                    } else if (i == 5){
+                        index_1 = 1;
+                        index_2 = 4;
+                        index_3 = 6;
+                    } else if (i == 6){
+                        index_1 = 2;
+                        index_2 = 5;
+                        index_3 = 7;
+                    } else if (i == 7){
+                        index_1 = 3;
+                        index_2 = 6;
+                        index_3 = 4;
+                    } 
+
+                    glm::vec3 vj = glm::normalize((*vertexs_refs[index_1]).position - (*vertexs_refs[i]).position);
+                    glm::vec3 vk = glm::normalize((*vertexs_refs[index_2]).position - (*vertexs_refs[i]).position);
+                    glm::vec3 vl = glm::normalize((*vertexs_refs[index_3]).position - (*vertexs_refs[i]).position);
+
+                    // Derivadas parciales de J respecto a cada vértice adyacente
+                    glm::vec3 dJ_dvj = glm::cross(vk, vl);
+                    glm::vec3 dJ_dvk = glm::cross(vl, vj);
+                    glm::vec3 dJ_dvl = glm::cross(vj, vk);
+
+                    // Derivadas parciales de vj, vk, vl respecto a la posición del vértice actual
+                    glm::vec3 dJ_dvi = dJ_dvj + dJ_dvk + dJ_dvl;
+
+                    (*vertexs_refs[i]).position += dJ_dvi;
+
+                    std::cout << "Nuevo posicion en " << (*vertexs_refs[i]).position.x << "  " << (*vertexs_refs[i]).position.y << "  " << (*vertexs_refs[i]).position.z << std::endl;
+                    std::cout << "Valor antiguo J " << J[i] << std::endl;
+
+                }
+                fix_needed = true;
+                break;
+            }
+
+            else // No es necesario Fix
+                continue; // Avanzar al sgte J_
+
+            
+        }
+
+        if (!fix_needed)
+            return true;
+
+        actual_try ++;
+    }
+
+    return false;
+
+
+
+
+}
+
 void Pyramid::CalculateJR() 
 {
     //std::cout << "Calculando JR" << std::endl;
@@ -546,7 +777,7 @@ void Pyramid::CalculateAREN()
 }
 
 
-Prism::Prism(std::vector<std::shared_ptr<Vertex>>& vasad) : Polyhedral(vasad)
+Prism::Prism(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 {
     vertexs_refs = vasad;
 }
@@ -711,6 +942,10 @@ void Polyhedral_Mesh::CalculateJ()
 {
     for (auto poly: polys)
     {
+        poly->J.clear();
+        poly->JR.clear();
+        poly->Jens.clear();
+
         poly->CalculateJ();
         poly->CalculateJR();
         poly->CalculateAR();
@@ -848,16 +1083,19 @@ void Polyhedral_Mesh::GetJ()
 }
 
 
-void Polyhedral_Mesh::FormPolys()
+void Polyhedral_Mesh::FormPolys(const std::vector<Vertex>& vertices)
 {
+
+
     std::cout << "FormPolys call\nTamano types: " << types.size() << std::endl;
+
     for (int i = 0; i < types.size(); i++)
     {
-        std::vector<std::shared_ptr<Vertex>> vertex_refs;
+        std::vector<Vertex*> vertex_refs;
 
         for (int j = 0; j < indexs[i].size(); j++)
         {
-            vertex_refs.push_back(std::make_shared<Vertex>(vertexs[indexs[i][j]]));
+            vertex_refs.push_back(const_cast<Vertex *>(&vertices[indexs[i][j]]));
         }
 
         if (types[i] == 12)
@@ -1028,17 +1266,17 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
             converted.push_back({indexs[i][0], indexs[i][2], indexs[i][1]});
             converted.push_back({indexs[i][0], indexs[i][3], indexs[i][2]});
             
-            converted.push_back({indexs[i][0], indexs[i][1], indexs[i][4]});
+            converted.push_back({indexs[i][1], indexs[i][4], indexs[i][0]});
             converted.push_back({indexs[i][1], indexs[i][5], indexs[i][4]});
 
-            converted.push_back({indexs[i][0], indexs[i][4], indexs[i][3]});
+            converted.push_back({indexs[i][3], indexs[i][0], indexs[i][4]});
             converted.push_back({indexs[i][3], indexs[i][4], indexs[i][7]});
             
             converted.push_back({indexs[i][4], indexs[i][5], indexs[i][6]});
             converted.push_back({indexs[i][4], indexs[i][6], indexs[i][7]});
 
-            converted.push_back({indexs[i][1], indexs[i][2], indexs[i][5]});
-            converted.push_back({indexs[i][2], indexs[i][6], indexs[i][5]});
+            converted.push_back({indexs[i][5], indexs[i][1], indexs[i][2]});
+            converted.push_back({indexs[i][5], indexs[i][2], indexs[i][6]});
 
             converted.push_back({indexs[i][2], indexs[i][3], indexs[i][7]});
             converted.push_back({indexs[i][2], indexs[i][7], indexs[i][6]});

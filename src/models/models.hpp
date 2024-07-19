@@ -32,16 +32,30 @@ public:
 
 	Polyhedral_Mesh polyMesh;
 
+	void updateNormals();
+	void UpdateMeshLines();
+	void UpdateModelGraph();
+
 private:
 	void calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles);
+	void renderNormals(const std::vector<Vertex>& vertices);
+	
 	void silhouette();
 	void BindShader();
+	void DrawMeshLines();
 
     GLuint ID_VAO;
 	GLuint ID_VBO;
     GLuint ID_EBO;
 
+	void BindMeshLines();
+
 	GLuint vaoLines;
+	GLuint vboLineVertices;
+
+	GLuint vaoMeshLines;
+	GLuint vboMeshLines;
+
 
 	GLuint Normal_VBO;
 

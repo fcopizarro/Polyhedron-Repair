@@ -9,9 +9,9 @@ class Polyhedral
 {
 protected:
     std::vector <float> lengths;
-    std::vector<std::shared_ptr<Vertex>> vertexs_refs;
     
 public:
+    std::vector<Vertex*> vertexs_refs;
     std::vector <float> J, JR, Jens;
     float AR, ARG, ARen, EQ;
     virtual void CalculateJ(){}
@@ -21,9 +21,15 @@ public:
     virtual void CalculateJENS(){}
     virtual void CalculateEQ(){}
     virtual void CalculateAREN(){}
+    virtual std::tuple<int, int, int> GetAdjs(int) = 0;
 
-    Polyhedral(std::vector<std::shared_ptr<Vertex>>&);
+    Polyhedral(const std::vector<Vertex*>&);
     void GiveColor(glm::vec3, glm::vec3);
+    bool FixJ(float , int );
+    glm::vec3 GenerateRandomMove();
+    float SimulateJ(glm::vec3 );
+    bool EasyFix(float t);
+
 };
 
 class Hexaedral: public virtual Polyhedral
@@ -31,13 +37,14 @@ class Hexaedral: public virtual Polyhedral
 private:
     float k = 1.0f;
 public:
-    Hexaedral(std::vector<std::shared_ptr<Vertex>>&);
+    Hexaedral(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+    std::tuple<int, int, int> GetAdjs(int) override;
     
 };
 
@@ -46,7 +53,7 @@ class Tetrahedra: public virtual Polyhedral
 private:
     float kens = sqrt(2) / 2;
 public:
-    Tetrahedra(std::vector<std::shared_ptr<Vertex>>&);
+    Tetrahedra(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
@@ -54,6 +61,7 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+    std::tuple<int, int, int> GetAdjs(int) override;
 };
 
 class Pyramid: public virtual Polyhedral
@@ -64,7 +72,7 @@ private:
     float kar = sqrt(6) / 3;
     std::vector<glm::vec3> midpoints;
 public:
-    Pyramid(std::vector<std::shared_ptr<Vertex>>&);
+    Pyramid(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
@@ -72,6 +80,7 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+    std::tuple<int, int, int> GetAdjs(int) override;
 };
 
 class Prism: public virtual Polyhedral
@@ -80,7 +89,7 @@ private:
     float kens= sqrt(3) / 3;
     float kar = sqrt(6) / 3;
 public:
-    Prism(std::vector<std::shared_ptr<Vertex>>&);
+    Prism(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
@@ -88,6 +97,7 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+    std::tuple<int, int, int> GetAdjs(int) override;
 };
 
 
@@ -106,7 +116,7 @@ public:
     void PushType(int);
     void PushIndex(std::vector<int>);
     void toString();
-    void FormPolys();
+    void FormPolys(const std::vector<Vertex>&);
     void CalculateJ();
     void GetJ();
 
@@ -125,6 +135,8 @@ public:
     std::vector<float> JData;
 
     int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
+
+    void FixJ(float , int );
     
 };
 

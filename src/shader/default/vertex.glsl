@@ -6,10 +6,10 @@ layout(location = 2) in vec3 aColor;
 layout(location = 3) in float aType;
 
 
-out vec3 Normal;      // Normal que pasaremos al fragment shader
+flat out vec3 Normal;      // Normal que pasaremos al fragment shader
 out vec3 FragPos;     // Posición del fragmento en el espacio mundial
-out vec3 Color;
-out vec3 ReflectColor;
+flat out vec3 Color;
+flat out vec3 ReflectColor;
 
 flat out float vType;
 

@@ -26,7 +26,6 @@ int main(int argc, char* argv[])
     
     bool quit = false;    
 
-
     
     int msaa_buffers;
     int msaa_samples;
