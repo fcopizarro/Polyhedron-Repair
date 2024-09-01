@@ -95,6 +95,15 @@ void Camera::Inputs(SDL_Event& event)
 			Position += speed * -Up;
 			break;
 
+		
+		case SDLK_PLUS:
+			radius += 0.5f;
+			break;
+
+		case SDLK_MINUS:
+			radius -= 0.5f;
+			break;
+
         
         default:
             break;

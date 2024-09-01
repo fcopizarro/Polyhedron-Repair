@@ -60,7 +60,7 @@ int pickVertex(int mouseX, int mouseY, int screenWidth, int screenHeight, const 
     }
 }
 
-void Event::handle(bool &quit, Camera& camera, Model& model, UI& ui )
+void Event::handle(bool &quit, Scene& scene, UI& ui )
 {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) {
@@ -68,16 +68,21 @@ void Event::handle(bool &quit, Camera& camera, Model& model, UI& ui )
             quit = true;
         }
 
-        camera.Inputs(e);
+        scene.camera->Inputs(e);
 
         ImGui_ImplSDL2_ProcessEvent(&e);
+
+
 
         if (e.type == SDL_MOUSEBUTTONDOWN) {
             if (e.button.button == SDL_BUTTON_LEFT) {
                 if(const auto& io = ImGui::GetIO(); !io.WantCaptureMouse) {
-
-                ui.closestIndex = pickVertex(e.button.x, e.button.y, ui.width, ui.height, camera.GetProjection(), camera.GetView(), model.get_vertices());
-                ui.vertice = model.get_vertices();
+                
+                    if (scene.model_in_scene)
+                    {
+                        ui.closestIndex = pickVertex(e.button.x, e.button.y, ui.width, ui.height, scene.camera->GetProjection(), scene.camera->GetView(), scene.model->get_vertices());
+                        ui.vertice = scene.model->get_vertices();
+                    }
                 }
             }
         }

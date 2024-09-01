@@ -20,8 +20,7 @@ Scene::Scene(const unsigned int width, const unsigned int height)
 void Scene::Update(Shader& shader, UI& ui)
 {
     shader.Activate();
-    glClearColor(0.07f, 0.13f, 0.17f, 2.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
 
     glUniform3f(glGetUniformLocation(shader.ID, "lightDir"), lightDir.x, lightDir.y, lightDir.z);
     glUniform3f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
@@ -63,39 +62,42 @@ void Scene::Update(Shader& shader, UI& ui)
         ui.qtyTetra = model->polyMesh.qtyTetra;
 
         camera->cameraTarget = glm::vec3( (model->boundary.min.x + model->boundary.max.x) / 2.0f, (model->boundary.min.y + model->boundary.max.y) / 2.0f, (model->boundary.min.z + model->boundary.max.z) / 2.0f  );
-    }
-
-    if(ui.includeHexa != model->polyMesh.includeHexa 
-    || ui.includeTetra != model->polyMesh.includeTetra
-    || ui.includePrism != model->polyMesh.includePrism
-    || ui.includePyra != model->polyMesh.includePyra
-    || ui.includeHexa2 != model->polyMesh.includeHexa2
-    || ui.includeTetra2 != model->polyMesh.includeTetra2
-    || ui.includePrism2 != model->polyMesh.includePrism2
-    || ui.includePyra2 != model->polyMesh.includePyra2
+   
     
-        )
-    {
-        model->polyMesh.includeHexa = ui.includeHexa;
-        model->polyMesh.includeTetra = ui.includeTetra;
-        model->polyMesh.includePrism = ui.includePrism;
-        model->polyMesh.includePyra = ui.includePyra;
-        model->polyMesh.includeHexa2 = ui.includeHexa2;
-        model->polyMesh.includeTetra2 = ui.includeTetra2;
-        model->polyMesh.includePrism2 = ui.includePrism2;
-        model->polyMesh.includePyra2 = ui.includePyra2;
-        // calculatej cuando hay cambio de vert
-        model->polyMesh.GetJ();
-        ui.histogramData = model->polyMesh.Jtotal;
-        ui.Jdata = model->polyMesh.Jdata;
-        ui.JRdata = model->polyMesh.JRdata;
-        ui.JENSdata = model->polyMesh.JENSdata;
-        ui.EQdata = model->polyMesh.EQdata;
+        
+        if(ui.includeHexa != model->polyMesh.includeHexa 
+        || ui.includeTetra != model->polyMesh.includeTetra
+        || ui.includePrism != model->polyMesh.includePrism
+        || ui.includePyra != model->polyMesh.includePyra
+        || ui.includeHexa2 != model->polyMesh.includeHexa2
+        || ui.includeTetra2 != model->polyMesh.includeTetra2
+        || ui.includePrism2 != model->polyMesh.includePrism2
+        || ui.includePyra2 != model->polyMesh.includePyra2
+        
+            )
+        {
+            model->polyMesh.includeHexa = ui.includeHexa;
+            model->polyMesh.includeTetra = ui.includeTetra;
+            model->polyMesh.includePrism = ui.includePrism;
+            model->polyMesh.includePyra = ui.includePyra;
+            model->polyMesh.includeHexa2 = ui.includeHexa2;
+            model->polyMesh.includeTetra2 = ui.includeTetra2;
+            model->polyMesh.includePrism2 = ui.includePrism2;
+            model->polyMesh.includePyra2 = ui.includePyra2;
+            // calculatej cuando hay cambio de vert
+            model->polyMesh.GetJ();
+            ui.histogramData = model->polyMesh.Jtotal;
+            ui.Jdata = model->polyMesh.Jdata;
+            ui.JRdata = model->polyMesh.JRdata;
+            ui.JENSdata = model->polyMesh.JENSdata;
+            ui.EQdata = model->polyMesh.EQdata;
 
-        ui.ARtotal = model->polyMesh.ARtotal;
-        ui.ARdata = model->polyMesh.ARdata;
-        ui.ARGdata = model->polyMesh.ARGdata;
-        ui.ARENdata = model->polyMesh.ARENdata;
+            ui.ARtotal = model->polyMesh.ARtotal;
+            ui.ARdata = model->polyMesh.ARdata;
+            ui.ARGdata = model->polyMesh.ARGdata;
+            ui.ARENdata = model->polyMesh.ARENdata;
+        }
+
     }
 
     
@@ -105,7 +107,7 @@ void Scene::LoadObject(const std::string& file_, glm::vec3 color)
 {
     model = new Model(file_, color);
     model_in_scene = true;
-
+    
 
 }
 

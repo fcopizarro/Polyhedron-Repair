@@ -1,4 +1,6 @@
 #include "ui.hpp"
+#include "scene/scene.hpp"
+
 
 #include <math.h>
 
@@ -102,8 +104,10 @@ void Demo_Histogram() {
 void UI::HistogramMenu()
 {
 
+    if (jM)
+    {
 
-    if(ImGui::Begin("Jacobian Metrics")) {
+    if(ImGui::Begin("Jacobian Metrics", &jM)) {
         ImGui::SetNextItemWidth(200);
         if (ImGui::RadioButton("N Bins",binsJ>=0))                  { binsJ = 50;}
         if (binsJ>=0) {
@@ -119,8 +123,8 @@ void UI::HistogramMenu()
         ImGui::Checkbox("JR", &showJR);
         ImGui::SameLine();
         ImGui::Checkbox("Jens", &showJens);
-        ImGui::SameLine();
-        ImGui::Checkbox("EQ", &showEQ);
+        //ImGui::SameLine();
+        //ImGui::Checkbox("EQ", &showEQ);
 
 
 
@@ -175,21 +179,25 @@ void UI::HistogramMenu()
             ImPlot::PlotHistogram("Jens", JENSdata.data(), JENSdata.size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
             }
 
+            /*
             if(showEQ)
             {
             ImPlot::SetNextLineStyle(ImVec4(0,1,1,1));
             ImPlot::SetNextFillStyle(ImVec4(0,1,1,1), 0.25);
             ImPlot::PlotHistogram("Quality", EQdata.data(), EQdata.size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
             }
+            */
             
             ImPlot::EndPlot();
         }
 
     }
     ImGui::End();
+    }
 
-    
-    if(ImGui::Begin("Aspect Ratio Metrics")) {
+    if (aM)
+    {
+    if(ImGui::Begin("Aspect Ratio Metrics", &aM)) {
         ImGui::SetNextItemWidth(200);
         if (ImGui::RadioButton("N Bins",binsAR>=0))                  { binsAR = 50;}
         if (binsAR>=0) {
@@ -260,12 +268,17 @@ void UI::HistogramMenu()
             }
         }
     ImGui::End();
+    }
 }
 
 UI::UI (const unsigned int width,const unsigned int height)
 {
     this->width = width;
     this->height = height;
+
+    glEnable(GL_MULTISAMPLE);
+    // Enables the Depth Buffer
+    glEnable(GL_DEPTH_TEST);
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("Error inicializando SDL: %s\n", SDL_GetError());
@@ -319,28 +332,34 @@ UI::UI (const unsigned int width,const unsigned int height)
     glEnable(GL_FLAT);
     glShadeModel(GL_FLAT);
 
-    glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
+    //glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
     
     glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
+    
 
 }
 
-void UI::Update(Model& model) 
+void UI::Update(Scene& scene) 
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    MainMenu();
+    MainMenu(scene);
 
     NormalsMenu();
 
-    EditVertexMenu(model);
-    FixMenu(model);
+    EditVertexMenu(*scene.model);
+    FixMenu(*scene.model);
+
+    PersolizeMenu();
 
 
 
     HistogramMenu();
+
+    fileDialog.Display();
+
 
     
     ImGui::Render();
@@ -348,35 +367,54 @@ void UI::Update(Model& model)
     SDL_GL_SwapWindow(window);
 }
 
-void UI::MainMenu()
+void UI::MainMenu(Scene& scene)
 {
+    
     
     static float f = 0.0f;
     static int counter = 0;
 
-    ImGui::SetNextWindowSize(ImVec2((float)300.0f, (float)400.0f));
+    //ImGui::SetNextWindowSize(ImVec2((float)200.0f, (float)400.0f));
     ImGui::SetNextWindowPos(ImVec2(0, 0));
 
-    ImGui::Begin("Menu Principal");                          // Create a window called "Hello, world!" and append into it.
+    static bool my_tool_active = true;
 
-    ImGui::Text("Meshes cargados");               // Display some text (you can use a format strings too)
+    ImGui::Begin("Menu Principal", &my_tool_active, ImGuiWindowFlags_MenuBar);                          // Create a window called "Hello, world!" and append into it.
 
-    /*
-    ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-    ImGui::Checkbox("Another Window", &show_another_window);
+    if (ImGui::BeginMenuBar())
+{
+    if (ImGui::BeginMenu("Archivo"))
+    {
+        if (ImGui::MenuItem("Abrir..", "Ctrl+O")) { fileDialog.Open(); }
+        if (ImGui::MenuItem("Guardar", "Ctrl+S"))   { /* Do stuff */ }
+        if (ImGui::MenuItem("Cerrar", "Ctrl+W"))  
+        { 
+            if (scene.model_in_scene)
+            {
+            delete scene.model; //freed memory
+            scene.model = NULL;
+            scene.model_in_scene = false;
 
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-    ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            histogramData.clear();
+            Jdata.clear();
+            JRdata.clear();
+            JENSdata.clear();
+            EQdata.clear();
 
-    if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        counter++;
-    ImGui::SameLine();
-    ImGui::Text("counter = %d", counter);
-    */
-   ImGuiIO& io = ImGui::GetIO();
+            ARtotal.clear();
+            ARdata.clear();
+            ARGdata.clear();
+            ARENdata.clear();
 
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    
+            //scene.model->lineVertices.clear();
+            //scene.model->UpdateMeshLines();
+            }
+         }
+        ImGui::EndMenu();
+    }
+    ImGui::EndMenuBar();
+}
+
 
     //ImGui::Checkbox("Normales", &show_another_window);
 
@@ -408,29 +446,93 @@ void UI::MainMenu()
     // ImGui::ListBox("", &listbox_item_current, listbox_items, IM_ARRAYSIZE(listbox_items), 4);
 
 
-    ImGui::Button("Reemplazar");
-    ImGui::SameLine();
-    ImGui::Button("Agregar");
 
+    
+    if(fileDialog.HasSelected())
+    {
+            scene.LoadObject(fileDialog.GetSelected().string(), glm::vec3(1.0f, 0.0f, 0.0f));
+            std::cout << "Selected filename " << fileDialog.GetSelected().string() << std::endl;
+            fileDialog.ClearSelected();
+            //scene.LoadObject("vtks/Prueba3.vtk", glm::vec3(1.0f, 0.0f, 0.0f));
+
+                
+            scene.model->polyMesh.CalculateJ();
+            scene.model->polyMesh.GetJ();
+            histogramData.clear();
+
+            histogramData = scene.model->polyMesh.Jtotal;
+            Jdata = scene.model->polyMesh.Jdata;
+            JRdata = scene.model->polyMesh.JRdata;
+            JENSdata = scene.model->polyMesh.JENSdata;
+            EQdata = scene.model->polyMesh.EQdata;
+
+            ARtotal = scene.model->polyMesh.ARtotal;
+            ARdata = scene.model->polyMesh.ARdata;
+            ARGdata = scene.model->polyMesh.ARGdata;
+            ARENdata = scene.model->polyMesh.ARENdata;
+    }
+
+    /*
     if (ImGui::Button("Crear Octree"))
     {
         std::cout << "Creando Octree" << std::endl;
         createOctree = true;
 
-        /*
         OctreeNode* octree = new OctreeNode(BoundingBox (models_loaded[0].boundary.min, models_loaded[0].boundary.max), 0, 4);
         octree->subdivide(models_loaded[0].get_vertices());
         Model octree_model(octree);
         models_loaded.push_back(octree_model);
         models_loaded[0].display = false;
-        */
 
     }
+    */
 
-    ImGui::Text("%i Hexaedra", qtyHexa);
-    ImGui::Text("%i Tetrahedra", qtyTetra);
-    ImGui::Text("%i Pyramid", qtyPyra);
-    ImGui::Text("%i Prism", qtyPrism);
+   if(scene.model_in_scene)
+   {
+    ImGui::Text("Malla cargada desde:\n%s", scene.model->filename.c_str());               // Display some text (you can use a format strings too)
+
+    /*
+    ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+    ImGui::Checkbox("Another Window", &show_another_window);
+
+    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+    ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+    if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+        counter++;
+    ImGui::SameLine();
+    ImGui::Text("counter = %d", counter);
+    */
+   
+
+    ImGui::Text("\nInformacion de la Malla");
+
+    ImGui::Text("\nN° de vertices: %i", scene.model->vertices.size());
+
+    ImGui::Text("\nN° de poliedros: %i", scene.model->polyMesh.polys.size());
+    ImGui::Text(" %i Hexaedra", qtyHexa);
+    ImGui::Text(" %i Tetrahedra", qtyTetra);
+    ImGui::Text(" %i Pyramid", qtyPyra);
+    ImGui::Text(" %i Prism", qtyPrism);
+
+
+    ImGui::Text("\n\nMenús");
+    ImGui::Checkbox("Edición", &eM);
+    ImGui::SameLine();
+    ImGui::Checkbox("Metricas Jacobianas", &jM);
+    ImGui::Checkbox("Metricas AR", &aM);
+    ImGui::SameLine();
+    ImGui::Checkbox("Reparación", &fM);
+
+    ImGui::Text("\n");
+    ImGui::Checkbox("Personalización", &pM);
+
+
+
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Text("\n\n%.3f FPS", io.Framerate);
+   }
 
 
     ImGui::End();
@@ -440,11 +542,12 @@ void UI::MainMenu()
 
 void UI::EditVertexMenu(Model& model)
 {
-    
+    if (eM){
+
     ImGui::SetNextWindowSize(ImVec2((float)300.0f, (float)250.0f));
     ImGui::SetNextWindowPos(ImVec2((float)width - 250.0f - 10.0f , 0));
 
-    ImGui::Begin("Menu Edicion");                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Menu Edicion" , &eM);                          // Create a window called "Hello, world!" and append into it.
     
     ImGui::Checkbox("Modo Edición", &editMode);
 
@@ -495,6 +598,41 @@ void UI::EditVertexMenu(Model& model)
     }
 
     ImGui::End();
+    }
+}
+
+
+void UI::PersolizeMenu()
+{
+    
+    if (pM)
+    {
+    ImGui::Begin("Menu Personalización", &pM);                          // Create a window called "Hello, world!" and append into it.
+    
+    
+
+    ImVec4 colorFondo = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    ImGui::Text("Color Fondo");
+    ImGui::ColorEdit3("", (float*)&colorFondo);
+
+
+    ImVec4 colorMalla = ImVec4(1.0f, 1.0f, 1.0f, 1.00f);
+    ImGui::Text("Color Malla");
+    ImGui::ColorEdit3("", (float*)&colorMalla);
+
+    bool normales = false;
+    ImGui::Checkbox("Dibujar Normales", &normales);
+
+    bool lineas = true;
+    ImGui::Checkbox("Dibujar Aristas", &lineas);
+
+
+    
+
+
+    ImGui::End();
+    }
 }
 
 void UI::NormalsMenu()
@@ -514,30 +652,45 @@ void UI::NormalsMenu()
 
 void UI::FixMenu(Model& model) 
 {
-    static float Jscale = 0.0f;
-    ImGui::Begin("Menu Fix");   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+    if (fM)
+    {
+    static float scaleFix = 0.0f;
+    ImGui::Begin("Menu Fix", &fM);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     //ImGui::Checkbox("Visualizarlas", &show_normals);
     //ImGui::SliderFloat("float", &normal_scale, 0.0f, 10.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
     //ImGui::ColorEdit3("clear color", (float*)&normals_color);
-    ImGui::SliderFloat("float", &Jscale, -1.0f, 1.0f);
-    if (ImGui::Button("FixJ"))
+
+    ImGui::Text("Seleccione el metodo de reparacion");
+    static int metodo = 0;
+    ImGui::RadioButton("Aleatorio", &metodo, 0); 
+    ImGui::RadioButton("Gradiante", &metodo, 1);
+
+
+    ImGui::Text("\nSeleccione la metrica a reparar");
+    static int e = 0;
+    ImGui::RadioButton("Scaled Jacobian", &e, 0); 
+    ImGui::RadioButton("Jacobian Ratio", &e, 1);
+    ImGui::RadioButton("Jens", &e, 2);
+
+    ImGui::Text("\nSeleccione la calidad minima");
+    ImGui::SliderFloat("##", &scaleFix, -1.0f, 1.0f);
+
+    ImGui::Text("\nIntentos");
+    static int intentos = 1000;
+    ImGui::InputInt("##2", &intentos, -1, 1);
+
+    ImGui::Text("\n");
+    if (ImGui::Button("Reparar Malla"))
     {
-        model.polyMesh.FixJ(Jscale, 1);    
+        model.polyMesh.FixJ(scaleFix, intentos, metodo, e);    
         model.UpdateModelGraph();
-        model.UpdateMeshLines();
         model.updateNormals();
+        model.UpdateMeshLines();
 
         model.polyMesh.CalculateJ();
         model.polyMesh.GetJ();
         histogramData.clear();
-        /*
-        std::cout << " Cmbiasdiasdfjasdf    ";
-        for (auto J_: model.polyMesh.Jtotal)
-        {   
-            std::cout << J_ << "  ";
-        }
-        */
-        std::cout << std::endl;
+
         histogramData = model.polyMesh.Jtotal;
         Jdata = model.polyMesh.Jdata;
         JRdata = model.polyMesh.JRdata;
@@ -549,7 +702,43 @@ void UI::FixMenu(Model& model)
         ARGdata = model.polyMesh.ARGdata;
         ARENdata = model.polyMesh.ARENdata;
     }    
+
+    static int generados = 0;
+
+     if (ImGui::Button("Generar Resultados"))
+    {
+
+        std::string filename = "prueba" + std::to_string(generados) + ".txt";
+        std::ofstream outfile (filename);
+
+        outfile << "Resumen Js" << std::endl;
+        for (auto poly: model.polyMesh.polys)
+        {
+            for (float J_: poly->J)
+                outfile << std::to_string(J_) << std::endl;
+        }
+
+        outfile << std::endl << std::endl << "Resumen JR" << std::endl;
+        for (auto poly: model.polyMesh.polys)
+        {
+            for (float J_: poly->JR)
+                outfile << std::to_string(J_) << std::endl;
+        }
+
+        outfile << std::endl << std::endl << "Resumen Jens" << std::endl;
+        for (auto poly: model.polyMesh.polys)
+        {
+            for (float J_: poly->Jens)
+                outfile << std::to_string(J_) << std::endl;
+        }
+
+        outfile.close();
+        
+
+        generados ++;
+    }    
     ImGui::End();
+    }
 
 }
 

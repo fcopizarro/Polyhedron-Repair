@@ -137,13 +137,17 @@ void Model::BindShader()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    renderNormals(vertices);
+    //renderNormals(vertices);
     BindMeshLines();
 }
 
 
 void Model::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles)
 {
+    for (auto& vertex : vertices) {
+        vertex.normal = glm::vec3(0.0f);
+        vertex.count = 0;
+    }
 
     for (const auto& triangle : triangles) {
         glm::vec3& v0 = vertices[triangle.v0].position;
@@ -152,15 +156,24 @@ void Model::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vecto
 
         glm::vec3 edge1 = v1 - v0;
         glm::vec3 edge2 = v2 - v0;
+
         glm::vec3 normal = glm::normalize(glm::cross(edge1, edge2));
 
         vertices[triangle.v0].normal += normal;
         vertices[triangle.v1].normal += normal;
         vertices[triangle.v2].normal += normal;
+
+        vertices[triangle.v0].count++;
+        vertices[triangle.v1].count++;
+        vertices[triangle.v2].count++;
+
+
     }
 
     for (auto& vertex : vertices) {
-        vertex.normal = glm::normalize(vertex.normal);
+        if (vertex.count > 0) {
+            vertex.normal = glm::normalize(vertex.normal / static_cast<float>(vertex.count));
+        }
     }
 }
 
@@ -419,8 +432,8 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
 
     }
 
-    if (debug)
-        std::cout << "DEBUG: " << line << std::endl;
+    //if (debug)
+    //    std::cout << "DEBUG: " << line << std::endl;
 
     std::string points, tipo;
     int points_num;
@@ -435,12 +448,12 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
             continue;
 
         iss >> points >> points_num >> tipo;
-        std::cout << "Puntos " <<  points_num << std::endl;
+        //std::cout << "Puntos " <<  points_num << std::endl;
 
         points_getted = true;
 
-        if (debug)
-            std::cout << "DEBUG: " << line << std::endl;
+        //if (debug)
+        //    std::cout << "DEBUG: " << line << std::endl;
     }
     
     std::vector <glm::vec3> points_vector;
@@ -467,7 +480,7 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
         if ( int(temp.size() / 3) >= points_num)
         {
             points_extracted = true;
-            std::cout << "Alcanzado" << std::endl;
+            //std::cout << "Alcanzado" << std::endl;
         }
     }
 
@@ -554,7 +567,7 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
 
         iss_cells >> cells_types >> n_cells_types;
 
-        std::cout << line << std::endl;
+        //std::cout << line << std::endl;
         cellstype_getted = true;
     }
 
@@ -592,30 +605,11 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
     //vertices = polyMesh.toVertex();
     tris = polyMesh.toTris();
 
-    std::cout << "VER" << vertices.size() << "\n TRI" << tris.size() << std::endl;
-    std::cout << vertices[0].position.x << " " << vertices[0].position.y << " " << vertices[0].position.z << std::endl;
-    std::cout << vertices[1].position.x << " " << vertices[1].position.y << " " << vertices[1].position.z << std::endl;
+    //std::cout << "VER" << vertices.size() << "\n TRI" << tris.size() << std::endl;
+    //std::cout << vertices[0].position.x << " " << vertices[0].position.y << " " << vertices[0].position.z << std::endl;
+    //std::cout << vertices[1].position.x << " " << vertices[1].position.y << " " << vertices[1].position.z << std::endl;
 
-    std::cout << tris[0].v0 << " " << tris[0].v1 << " " << tris[0].v2 << std::endl;
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-    
-
-    
-
-
+    //std::cout << tris[0].v0 << " " << tris[0].v1 << " " << tris[0].v2 << std::endl;
 
 }
 
@@ -667,10 +661,11 @@ void Model::silhouette()
 
 void Model::renderNormals(const std::vector<Vertex>& vertices) {
     
-    std::vector<glm::vec3> lineVertices;
+    /*
+    std::vector<glm::vec3> lineVertices2;
     for (const auto& vertex : vertices) {
-        lineVertices.push_back(vertex.position);
-        lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+        lineVertices2.push_back(vertex.position);
+        lineVertices2.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
     }
 
     glGenVertexArrays(1, &vaoLines);
@@ -678,9 +673,9 @@ void Model::renderNormals(const std::vector<Vertex>& vertices) {
 
     
 
-    glGenBuffers(1, &vboLineVertices);
+    glGenBuffers(1, &vboLineVertices2);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vboLineVertices);
+    glBindBuffer(GL_ARRAY_BUFFER, vboLineVertices2);
 
     glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
 
@@ -691,18 +686,19 @@ void Model::renderNormals(const std::vector<Vertex>& vertices) {
 
 
     glBindVertexArray(0); // Desenlazar VAO
+    */
 }
 
 void Model::updateNormals() {
-    std::vector<glm::vec3> lineVertices;
+    std::vector<glm::vec3> lineVertices2;
     for (const auto& vertex : vertices) {
-        lineVertices.push_back(vertex.position);
-        lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+        lineVertices2.push_back(vertex.position);
+        lineVertices2.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
     }
 
     glBindVertexArray(vaoLines);
     glBindBuffer(GL_ARRAY_BUFFER, vboLineVertices);
-    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, lineVertices2.size() * sizeof(glm::vec3), lineVertices2.data(), GL_DYNAMIC_DRAW);
     glBindVertexArray(0); // Desenlazar VAO
 }
 
@@ -717,7 +713,7 @@ void Model::Draw_normals()
 
 void Model::BindMeshLines()
 {
-    std::vector<glm::vec3> lineVertices;
+    lineVertices.clear();
     
     for (auto poly : polyMesh.polys) {
 
@@ -732,8 +728,8 @@ void Model::BindMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[2]).position);
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
 
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
             lineVertices.push_back((*poly->vertexs_refs[5]).position);
@@ -744,8 +740,8 @@ void Model::BindMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[6]).position);
             lineVertices.push_back((*poly->vertexs_refs[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
 
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
@@ -779,33 +775,90 @@ void Model::BindMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[2]).position);
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
         }
+        else if (std::dynamic_pointer_cast<Pyramid>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+        }
+        else if (std::dynamic_pointer_cast<Prism>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+
+        }
         //lineVertices.push_back(vertex.position);
         //lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
     }
 
+
+
     glGenVertexArrays(1, &vaoMeshLines);
+    glGenBuffers(1, &vboMeshLines);
     glBindVertexArray(vaoMeshLines);
 
-    
-
-    glGenBuffers(1, &vboMeshLines);
 
     glBindBuffer(GL_ARRAY_BUFFER, vboMeshLines);
-
     glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
 
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
     glEnableVertexAttribArray(0);
 
-
-
-    glBindVertexArray(0); // Desenlazar VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void Model::UpdateMeshLines()
 {
-    std::vector<glm::vec3> lineVertices;
+    lineVertices.clear();
     
     for (auto poly : polyMesh.polys) {
 
@@ -820,8 +873,8 @@ void Model::UpdateMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[2]).position);
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
 
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
             lineVertices.push_back((*poly->vertexs_refs[5]).position);
@@ -832,8 +885,8 @@ void Model::UpdateMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[6]).position);
             lineVertices.push_back((*poly->vertexs_refs[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[7]).position);
 
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[4]).position);
@@ -867,31 +920,81 @@ void Model::UpdateMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[2]).position);
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
         }
-        //lineVertices.push_back(vertex.position);
-        //lineVertices.push_back(vertex.position + vertex.normal * 0.1f); // Escalar normal para visualización
+        else if (std::dynamic_pointer_cast<Pyramid>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+        }
+        else if (std::dynamic_pointer_cast<Prism>(poly) != nullptr)
+        {
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+
+            
+            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+
+
+        }
     }
     
-    glBindVertexArray(vaoMeshLines);
-    glBindBuffer(GL_ARRAY_BUFFER, vboMeshLines);
-    glBufferData(GL_ARRAY_BUFFER, lineVertices.size() * sizeof(glm::vec3), lineVertices.data(), GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-    glEnableVertexAttribArray(0);
-    glBindVertexArray(0); // Desenlazar VAO
 
-    
+    glBindBuffer(GL_ARRAY_BUFFER, vboMeshLines);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, lineVertices.size() * sizeof(glm::vec3), lineVertices.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     
 }
 
 void Model::DrawMeshLines()
 {
     glBindVertexArray(vaoMeshLines);
-    glLineWidth(3.0f);
-    glDrawArrays(GL_LINES, 0, 
-                                vertices.size() * 12 * polyMesh.qtyHexa // Hexaedro 
-                                + vertices.size() * 6 * polyMesh.qtyTetra      //Tetrahedro
-                                + 0
-                                + 0
-    );
+    glLineWidth(2.0f);
+    //std::cout << "CANTIDAD DE VERTICES" << vertices.size() << std::endl;
+    glDrawArrays(GL_LINES, 0, lineVertices.size());
     
     glBindVertexArray(0);
 }

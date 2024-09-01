@@ -18,6 +18,7 @@
 #include <backends/imgui_impl_sdl2.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <implot.h>
+#include <imfilebrowser.h>
 
 #include <GL/glu.h>
 #include <GL/gl.h>
@@ -39,10 +40,12 @@
 
 
 
+
 struct Vertex {
     glm::vec3 position;
     glm::vec3 normal;
     glm::vec3 color;
+    int count = 0;
 
     Vertex(glm::vec3 position, glm::vec3 normal, glm::vec3 color) : position(position), normal(normal), color(color) {}
     Vertex(glm::vec3 position, glm::vec3 normal) : position(position), normal(normal) {}

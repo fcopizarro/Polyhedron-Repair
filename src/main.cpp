@@ -22,7 +22,6 @@ int main(int argc, char* argv[])
 	Shader shader("../src/shader/default/vertex.glsl", "../src/shader/default/fragment.glsl");
     Event event;
     
-    scene.LoadObject("vtks/Hexaedro.vtk", glm::vec3(1.0f, 0.0f, 0.0f));
     
     bool quit = false;    
 
@@ -38,7 +37,10 @@ int main(int argc, char* argv[])
 
 	while (!quit)
 	{
-        event.handle(quit, *scene.camera, *scene.model, ui);
+        glClearColor(0.07f, 0.13f, 0.17f, 2.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        event.handle(quit, scene, ui);
 
 		shader.Activate();
         
@@ -57,7 +59,7 @@ int main(int argc, char* argv[])
         */
 
 
-        ui.Update(*scene.model);
+        ui.Update(scene);
 
 	}
 

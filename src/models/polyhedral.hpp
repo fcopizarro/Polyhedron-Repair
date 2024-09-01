@@ -23,12 +23,22 @@ public:
     virtual void CalculateAREN(){}
     virtual std::tuple<int, int, int> GetAdjs(int) = 0;
 
+    virtual float CalculateJ_index(int ) = 0;
+    virtual float SimulateMoveJ(int , const glm::vec3&) = 0;
+
+    virtual float CalculateJR_index(int ) = 0;
+    virtual float SimulateMoveJR(int , const glm::vec3&) = 0;
+
+    virtual float CalculateJens_index(int ) = 0;
+    virtual float SimulateMoveJens(int , const glm::vec3&) = 0;
+
     Polyhedral(const std::vector<Vertex*>&);
     void GiveColor(glm::vec3, glm::vec3);
     bool FixJ(float , int );
     glm::vec3 GenerateRandomMove();
     float SimulateJ(glm::vec3 );
-    bool EasyFix(float t);
+    bool EasyFix(float t, int, int);
+    bool GradFix(float t, int maxtrys, int selected_metric);
 
 };
 
@@ -44,6 +54,16 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+
+    float CalculateJ_index(int index) override;
+    float SimulateMoveJ(int , const glm::vec3& ) override;
+
+    float CalculateJR_index(int index) override;
+    float SimulateMoveJR(int , const glm::vec3& ) override;
+
+    float CalculateJens_index(int index) override;
+    float SimulateMoveJens(int , const glm::vec3& ) override;
+
     std::tuple<int, int, int> GetAdjs(int) override;
     
 };
@@ -61,6 +81,17 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+
+    float CalculateJ_index(int index) override;
+    float SimulateMoveJ(int , const glm::vec3&) override;
+
+    float CalculateJR_index(int index) override;
+    float SimulateMoveJR(int , const glm::vec3& ) override;
+
+    float CalculateJens_index(int index) override;
+    float SimulateMoveJens(int , const glm::vec3& ) override;
+
+
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
@@ -80,6 +111,17 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+
+    float CalculateJ_index(int index) override;
+    float SimulateMoveJ(int , const glm::vec3& ) override;
+
+    float CalculateJR_index(int index) override;
+    float SimulateMoveJR(int , const glm::vec3& ) override;
+
+    float CalculateJens_index(int index) override;
+    float SimulateMoveJens(int , const glm::vec3& ) override;
+
+
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
@@ -97,6 +139,17 @@ public:
     void CalculateJENS() override;
     void CalculateEQ() override;
     void CalculateAREN() override;
+
+    float CalculateJ_index(int index) override;
+    float SimulateMoveJ(int , const glm::vec3& ) override;
+
+    float CalculateJR_index(int index) override;
+    float SimulateMoveJR(int , const glm::vec3& ) override;
+
+    float CalculateJens_index(int index) override;
+    float SimulateMoveJens(int , const glm::vec3& ) override;
+
+
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
@@ -136,7 +189,7 @@ public:
 
     int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
 
-    void FixJ(float , int );
+    void FixJ(float , int, int, int);
     
 };
 

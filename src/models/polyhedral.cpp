@@ -29,11 +29,11 @@ Hexaedral::Hexaedral(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 
 std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
 {
+    //std::cout << "Called from Hexa GetAdjs" << std::endl;
     switch (index)
     {
     case 0:
         return {1, 3, 4};
-        break;
     case 1:
         return {0, 5, 2};
     case 2:
@@ -55,14 +55,45 @@ std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
 }
 std::tuple<int, int, int> Tetrahedra::GetAdjs (int index)
 {
+
+
+
     switch (index)
     {
+    case 0:
+        return {1, 2, 3};
+    case 1:
+        return {0, 3, 2};
+    case 2:
+        return {0, 1, 3};
+    case 3:
+        return {0, 2, 1};
     default:
         return {0, 0, 0};
     }
 
 }
-std::tuple<int, int, int> Prism::GetAdjs (int index) {return {0, 0, 0};}
+std::tuple<int, int, int> Prism::GetAdjs (int index)
+{
+    switch(index)
+    {
+        case 0:
+            return {1, 2, 3};
+        case 1:
+            return {0, 4, 2};
+        case 2:
+            return {0, 1, 5};
+        case 3:
+            return {0, 5, 4};
+        case 4:
+            return {1, 3, 5};
+        case 5:
+            return {2, 4, 3};
+        default:
+            return {0, 0, 0};
+    }
+
+}
 std::tuple<int, int, int> Pyramid::GetAdjs (int index)
 {
     return {0,0,0};
@@ -70,76 +101,24 @@ std::tuple<int, int, int> Pyramid::GetAdjs (int index)
 
 void Hexaedral::CalculateJ() 
 {
-    //std::cout << "Calculando J" << std::endl;
-    
-    // Js
-    // 0 -> 1 3 4
-    // 1 -> 0 2 5
-    // 2 -> 1 3 6
-    // 3 -> 0 2 7
-    // 4 -> 0 5 7
-    // 5 -> 1 4 6
-    // 6 -> 2 5 7
-    // 7 -> 3 4 6
-    glm::vec3 origin;
-    glm::vec3 normalizedv1, normalizedv2, normalizedv3 ;
-    
-    origin = (*vertexs_refs[0]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    J.clear();
 
-    origin = (*vertexs_refs[1]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    for (int index = 0; index < 8; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
-    origin = (*vertexs_refs[2]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[6]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[3]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[7]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-
-    origin = (*vertexs_refs[4]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[7]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[5]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[6]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[6]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[7]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[7]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[6]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
+        glm::vec3 origin = (*vertexs_refs[index]).position;;
+        glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - origin );
+        glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - origin );
+        glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - origin );
+        J.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
 
 
 }
 void Hexaedral::CalculateJR() 
 {
-    //std::cout << "Calculando JR" << std::endl;
-
+    JR.clear();
     float JsMax = *max_element(J.begin(), J.end());
 
     for(float J_: J)
@@ -230,7 +209,7 @@ void Hexaedral::CalculateAR()
 } 
 void Hexaedral::CalculateJENS()
 {
-    // Jens = JS, con k = 1.
+    Jens.clear();
     Jens = J;
 }
 void Hexaedral::CalculateEQ()
@@ -271,39 +250,19 @@ Tetrahedra::Tetrahedra(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 }
 void Tetrahedra::CalculateJ() 
 {
-    //std::cout << "Calculando J Tetra" << std::endl;
-    
-    // Js
-    // 0 -> 1 2 3
-    // 1 -> 0 2 3
-    // 2 -> 0 1 3
-    // 3 -> 0 1 2
-    glm::vec3 origin;
-    glm::vec3 normalizedv1, normalizedv2, normalizedv3 ;
-    
-    origin = (*vertexs_refs[0]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
 
-    origin = (*vertexs_refs[1]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    J.clear();
 
-    origin = (*vertexs_refs[2]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    for (int index = 0; index < 4; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
-    origin = (*vertexs_refs[3]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+        glm::vec3 origin = (*vertexs_refs[index]).position;;
+        glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - origin );
+        glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - origin );
+        glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - origin );
+        J.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
 
 }
 void Tetrahedra::CalculateJR() 
@@ -345,7 +304,7 @@ void Tetrahedra::CalculateARG()
 {
     float R = 0.0f;
 
-    for (float  length: lengths)
+    for (float length: lengths)
     {
         R += pow(length, 2);
     }
@@ -414,19 +373,21 @@ void Tetrahedra::CalculateEQ()
 void Tetrahedra::CalculateAREN()
 {
     ARen = AR;
-}
+}   
 
 Pyramid::Pyramid(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 {
     vertexs_refs = vasad;
 }
+
 void Pyramid::CalculateJ() 
-{
+{   
+    midpoints.clear();
     // Se trata como un hexaedro mal formado, calculando los 4 puntos gaussianos en la puntos de la piramide.
-    midpoints.push_back(glm::mix((*vertexs_refs[0]).position, (*vertexs_refs[4]).position, 0.5f));
-    midpoints.push_back(glm::mix((*vertexs_refs[1]).position, (*vertexs_refs[4]).position, 0.5f));
-    midpoints.push_back(glm::mix((*vertexs_refs[2]).position, (*vertexs_refs[4]).position, 0.5f));
-    midpoints.push_back(glm::mix((*vertexs_refs[3]).position, (*vertexs_refs[4]).position, 0.5f));
+    midpoints.push_back(glm::mix((*vertexs_refs[0]).position, (*vertexs_refs[4]).position, 0.99f));
+    midpoints.push_back(glm::mix((*vertexs_refs[1]).position, (*vertexs_refs[4]).position, 0.99f));
+    midpoints.push_back(glm::mix((*vertexs_refs[2]).position, (*vertexs_refs[4]).position, 0.99f));
+    midpoints.push_back(glm::mix((*vertexs_refs[3]).position, (*vertexs_refs[4]).position, 0.99f));
 
     glm::vec3 origin;
     glm::vec3 normalizedv1, normalizedv2, normalizedv3 ;
@@ -455,40 +416,49 @@ void Pyramid::CalculateJ()
     normalizedv3 = glm::normalize( midpoints[3] - origin );
     J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
 
+
+
+
     std::vector <float> values_gauss; 
-    origin = midpoints[0];
+    
+    origin = (*vertexs_refs[4]).position;;
     normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( midpoints[3] - origin );
-    normalizedv3 = glm::normalize( midpoints[1] - origin );
+    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
+    normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
     values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
 
-    origin = midpoints[1];
+    origin = (*vertexs_refs[4]).position;;
+    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
+    normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
+    normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
+    values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+    origin = (*vertexs_refs[4]).position;;
     normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( midpoints[0] - origin );
-    normalizedv3 = glm::normalize( midpoints[2] - origin );
+    normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
+    normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
     values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
 
-    origin = midpoints[2];
-    normalizedv1 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv2 = glm::normalize( midpoints[1] - origin );
-    normalizedv3 = glm::normalize( midpoints[3] - origin );
-    values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = midpoints[3];
+    origin = (*vertexs_refs[4]).position;;
     normalizedv1 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    normalizedv2 = glm::normalize( midpoints[2] - origin );
-    normalizedv3 = glm::normalize( midpoints[0] - origin );
+    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
+    normalizedv3 = glm::normalize( (*vertexs_refs[0]).position - origin );
     values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
 
     float min_ele = *min_element(values_gauss.begin(), values_gauss.end());
     J.push_back(min_ele);
 }
 
-void Polyhedral_Mesh::FixJ(float minJ, int maxtrys)
+void Polyhedral_Mesh::FixJ(float min_metric, int maxtrys, int method, int selected_metric)
 {
     for (auto poly: polys)
     {
-        poly->FixJ(minJ, maxtrys);
+        // EasyFix -> metodo Random
+        if (method == 0)
+        poly->EasyFix(min_metric, maxtrys, selected_metric);
+
+        else if (method == 1)
+        poly->GradFix(min_metric, maxtrys,selected_metric);
     }
 }
 
@@ -512,37 +482,99 @@ float Polyhedral::SimulateJ(glm::vec3 new_vertex)
 
 
 
-bool Polyhedral::EasyFix(float t) // t: umbral
+bool Polyhedral::EasyFix(float t, int maxtrys, int selected_metric) // t: umbral
 {
-    // Conseguir todos los vertices bajo el umbral
-    std::vector <int> indexs_to_fix;
-    for (int i = 0; i < J.size(); i++)
+    std::vector<float>* ptrMetrica;
+
+    switch (selected_metric)
     {
-        if (J[i] < t)
+    case 0:
+        ptrMetrica = &J;
+        break;
+    case 1:
+        ptrMetrica = &JR;
+        break;
+    case 2:
+        ptrMetrica = &Jens;
+        break;
+    default:
+        break;
+    }
+
+
+
+    // Conseguir todos los vertices bajo el umbral
+    // TODO: Ordenar vertices en base a su calidad.
+    std::vector <int> indexs_to_fix;
+    for (int i = 0; i < (*ptrMetrica).size(); i++)
+    {
+        if ((*ptrMetrica)[i] < t)
             indexs_to_fix.push_back(i);
     }
 
-    int actual_try = 0;
+    
 
     // Iterar sobre todos estos vertices
     for (int i = 0; i < indexs_to_fix.size(); i++)
     {
+        int actual_try = 0;
+        int maxtry = maxtrys;
+        
         bool fixed = false;
+
+        // Recalcular Metricas despues de cambiar de vertice
+        // Por si el reajuste de otro vertice causo que este fuera arreglado.
+        this->CalculateJ();
+        this->CalculateJR();
+        this->CalculateJENS();
+
 
         while(!fixed)
         {
-            
-            glm::vec3 mov = GenerateRandomMove();
-            //GetJforActualmov;
+            if((*ptrMetrica)[indexs_to_fix[i]] > t)
+            {
+                fixed = true;
+            }
 
+            glm::vec3 desp = GenerateRandomMove();
+
+            // Delta J
+            float bias = 0.005f;
+            desp = desp * (std::abs(1.0f - (*ptrMetrica)[indexs_to_fix[i]] ) / 1000.0f + bias);
+
+            glm::vec3 mov = (*vertexs_refs[indexs_to_fix[i]]).position + desp;
+
+            float simulatedmetric = -1.0f;
+
+            switch (selected_metric)
+            {
+            case 0:
+                simulatedmetric = this->SimulateMoveJ(indexs_to_fix[i], mov);
+                break;
+            case 1:
+                simulatedmetric = this->SimulateMoveJR(indexs_to_fix[i], mov);
+                break;
+            case 2:
+                simulatedmetric = this->SimulateMoveJens(indexs_to_fix[i], mov);
+                break;
+            
+            default:
+                break;
+            }
+                
             // Si alcanza el umbral T:
             //      pasar al sgte vertice
-            /*
-            if (actualJ > t)
+            //std::cout << "Proposed move " << mov.x << " " << mov.y << " " << mov.z << " J proposed " << simulatedmetric << std::endl;
+            
+            if (simulatedmetric > t)
             {
                 fixed = true;
                 // Mover vertice de indice a la posicion nueva.
                 // Pasar al sgte vertice
+                (*vertexs_refs[indexs_to_fix[i]]).position.x = mov.x;
+                (*vertexs_refs[indexs_to_fix[i]]).position.y = mov.y;
+                (*vertexs_refs[indexs_to_fix[i]]).position.z = mov.z;
+                (*ptrMetrica)[indexs_to_fix[i]] = simulatedmetric;
             } 
             
             // Si no:
@@ -550,13 +582,13 @@ bool Polyhedral::EasyFix(float t) // t: umbral
                 
                 //      Si mejora con respecto al valor anterior:
                 //          Mover hacia el nuevo punto
-                if (actualJ > J[indexs_to_fix[i]])
+                if (simulatedmetric > (*ptrMetrica)[indexs_to_fix[i]])
                 {
-
+                    (*vertexs_refs[indexs_to_fix[i]]).position.x = mov.x;
+                    (*vertexs_refs[indexs_to_fix[i]]).position.y = mov.y;
+                    (*vertexs_refs[indexs_to_fix[i]]).position.z = mov.z;
+                    (*ptrMetrica)[indexs_to_fix[i]] = simulatedmetric;
                 }
-                
-                //      Si no:
-                //          Aumentar intento ++
                 else
                     actual_try++;
                 
@@ -566,20 +598,188 @@ bool Polyhedral::EasyFix(float t) // t: umbral
             // Si se ha alcanzado el numero de intentos maximo:
             // Retornar false
             if(actual_try == maxtry)
+            {
+                std::cout << "Se alcanzo el intento maximo." << std::endl;
                 return false;
-            */
+            }
         }
         
     }
+
 
     return true;
     
     
 
+}
+
+
+
+bool Polyhedral::GradFix(float t, int maxtrys, int selected_metric) // t: umbral
+{
+    std::vector<float>* ptrMetrica;
+
+    switch (selected_metric)
+    {
+    case 0:
+        ptrMetrica = &J;
+        break;
+    case 1:
+        ptrMetrica = &JR;
+        break;
+    case 2:
+        ptrMetrica = &Jens;
+        break;
+    default:
+        break;
+    }
+
+
+
+    // Conseguir todos los vertices bajo el umbral
+    // TODO: Ordenar vertices en base a su calidad.
+    std::vector <int> indexs_to_fix;
+    for (int i = 0; i < (*ptrMetrica).size(); i++)
+    {
+        if ((*ptrMetrica)[i] < t)
+            indexs_to_fix.push_back(i);
+    }
+
     
 
+    
+
+    // Iterar sobre todos estos vertices
+    for (int i = 0; i < indexs_to_fix.size(); i++)
+    {
+        int actual_try = 0;
+        int maxtry = maxtrys;
+
+        float alpha = 0.1;
+        float epsilon = 0.1;
+        float epsilon_convergencia = 1e-5;
+
+
+        bool fixed = false;
+
+        // Recalcular Metricas despues de cambiar de vertice
+        // Por si el reajuste de otro vertice causo que este fuera arreglado.
+        this->CalculateJ();
+        this->CalculateJR();
+        this->CalculateJENS();
+
+
+        while(!fixed)
+        {
+            if((*ptrMetrica)[indexs_to_fix[i]] > t)
+            {
+                fixed = true;
+            }
+
+            glm::vec3 vec_plus_epsilon = (*vertexs_refs[indexs_to_fix[i]]).position + glm::vec3(epsilon);
+            glm::vec3 vec_minus_epsilon = (*vertexs_refs[indexs_to_fix[i]]).position - glm::vec3(epsilon);
+
+            float metric_plus, metric_minus;
+            
+            switch (selected_metric)
+            {
+            case 0:
+                metric_plus = this->SimulateMoveJ(indexs_to_fix[i], vec_plus_epsilon);
+                metric_minus = this->SimulateMoveJ(indexs_to_fix[i], vec_minus_epsilon);
+                break;
+            case 1:
+                metric_plus = this->SimulateMoveJR(indexs_to_fix[i], vec_plus_epsilon);
+                metric_minus = this->SimulateMoveJR(indexs_to_fix[i], vec_minus_epsilon);
+                break;
+            case 2:
+                metric_plus = this->SimulateMoveJens(indexs_to_fix[i], vec_plus_epsilon);
+                metric_minus = this->SimulateMoveJens(indexs_to_fix[i], vec_minus_epsilon);
+                break;
+            
+            default:
+                break;
+            }
+
+            glm::vec3 grad = (glm::vec3(metric_plus) - glm::vec3(metric_minus)) / (2 * epsilon);
+
+            glm::vec3 x_new = (*vertexs_refs[indexs_to_fix[i]]).position + alpha * grad;
+
+            // Evaluar la métrica
+
+            float simulatedmetric = -1.0f;
+
+            switch (selected_metric)
+            {
+            case 0:
+                simulatedmetric = this->SimulateMoveJ(indexs_to_fix[i], x_new);
+                break;
+            case 1:
+                simulatedmetric = this->SimulateMoveJR(indexs_to_fix[i], x_new);
+                break;
+            case 2:
+                simulatedmetric = this->SimulateMoveJens(indexs_to_fix[i], x_new);
+                break;
+            
+            default:
+                break;
+            }
+
+            
+            // Si alcanza el umbral T:
+            //      pasar al sgte vertice
+            //std::cout << "Proposed move " << indexs_to_fix[i] << " " << x_new.x << " " << x_new.y << " " << x_new.z << " J proposed " << simulatedmetric << std::endl;
+
+            if (simulatedmetric > t)
+            {
+                fixed = true;
+                // Mover vertice de indice a la posicion nueva.
+                // Pasar al sgte vertice
+                (*vertexs_refs[indexs_to_fix[i]]).position.x = x_new.x;
+                (*vertexs_refs[indexs_to_fix[i]]).position.y = x_new.y;
+                (*vertexs_refs[indexs_to_fix[i]]).position.z = x_new.z;
+                (*ptrMetrica)[indexs_to_fix[i]] = simulatedmetric;
+            } 
+            // Si no:
+            else {
+                
+                //      Si mejora con respecto al valor anterior:
+                //          Mover hacia el nuevo punto
+                if (simulatedmetric > (*ptrMetrica)[indexs_to_fix[i]] + epsilon_convergencia)
+                {
+                    (*vertexs_refs[indexs_to_fix[i]]).position.x = x_new.x;
+                    (*vertexs_refs[indexs_to_fix[i]]).position.y = x_new.y;
+                    (*vertexs_refs[indexs_to_fix[i]]).position.z = x_new.z;
+                    (*ptrMetrica)[indexs_to_fix[i]] = simulatedmetric;
+                }
+                else
+                {
+                    alpha *= 0.9f;
+                    actual_try++;
+                }
+
+
+                
+
+            }
+
+            // Si se ha alcanzado el numero de intentos maximo:
+            // Retornar false
+            if(actual_try == maxtry)
+            {
+                std::cout << "Se alcanzo el intento maximo." << std::endl;
+                return false;
+            }
+        }
+        
+    }
+
+
+    return true;
+    
+    
 
 }
+
 
 bool Polyhedral::FixJ(float minJ, int maxtrys)
 {
@@ -709,6 +909,24 @@ void Pyramid::CalculateAR()
 
     AR = min_dist / max_dist;
 }
+
+float CalculateValueJens(float Js, float k)
+{
+    if (Js > k)
+    {
+        return (1 + k) - Js ;
+    }
+    else if ( -k <= Js && Js <= k )
+    {
+        return Js / k ;
+    }
+    else if (Js < -k)
+    {
+        return -1 * (1 + k) - Js ;
+    }
+    return 0.0f;
+}
+
 void Pyramid::CalculateARG()
 {
    
@@ -720,25 +938,62 @@ void Pyramid::CalculateJENS()
 
     for (int i = 0; i < J.size(); i++)
     {
-        if (i == 4)
-            kens_ = kens_apex;
-        else 
-            kens_ = kens_base;
-
         float J_ = J[i];
 
-        if (J_ > kens_)
+
+        if (i == 4)
         {
-            Jens.push_back( (1 + kens_) - J_ );
+            kens_ = kens_apex;
+            glm::vec3 origin, normalizedv1, normalizedv2, normalizedv3;
+            std::vector <float> pos;
+           
+            
+            origin = (*vertexs_refs[4]).position;
+            normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
+            normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
+            normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            origin = (*vertexs_refs[4]).position;;
+            normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
+            normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
+            normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            origin = (*vertexs_refs[4]).position;;
+            normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
+            normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
+            normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            origin = (*vertexs_refs[4]).position;;
+            normalizedv1 = glm::normalize( (*vertexs_refs[3]).position - origin );
+            normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
+            normalizedv3 = glm::normalize( (*vertexs_refs[0]).position - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            bool in_negative = false;
+            for(float pos_: pos)
+            {
+                if(pos_ < 0.0f)
+                    in_negative = true;
+            }
+
+            if(in_negative)
+                Jens.push_back(*max_element(pos.begin(), pos.end()));
+            else
+                Jens.push_back(*min_element(pos.begin(), pos.end()));
+
+
+
         }
-        else if ( -kens_ <= J_ && J_ <= kens_ )
+        else 
         {
-            Jens.push_back( J_ / kens_ );
+            kens_ = kens_base;
+            Jens.push_back(CalculateValueJens(J_, kens_));
         }
-        else if (J_ < -kens_)
-        {
-            Jens.push_back( -1 * (1 + kens_) - J_ );
-        }
+
+
     }
     
 }
@@ -783,51 +1038,18 @@ Prism::Prism(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 }
 void Prism::CalculateJ() 
 {
-    //std::cout << "Calculando J Tetra" << std::endl;
-    
-    // Js
-    // 0 -> 1 2 3
-    // 1 -> 0 2 3
-    // 2 -> 0 1 3
-    // 3 -> 0 1 2
-    glm::vec3 origin;
-    glm::vec3 normalizedv1, normalizedv2, normalizedv3 ;
-    
-    origin = (*vertexs_refs[0]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    J.clear();
 
-    origin = (*vertexs_refs[1]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    for (int index = 0; index < 6; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
-    origin = (*vertexs_refs[2]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[3]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[4]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[5]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
-
-    origin = (*vertexs_refs[5]).position;
-    normalizedv1 = glm::normalize( (*vertexs_refs[2]).position - origin );
-    normalizedv2 = glm::normalize( (*vertexs_refs[4]).position - origin );
-    normalizedv3 = glm::normalize( (*vertexs_refs[3]).position - origin );
-    J.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+        glm::vec3 origin = (*vertexs_refs[index]).position;
+        glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - origin );
+        glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - origin );
+        glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - origin );
+        J.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
 }
 void Prism::CalculateJR() 
 {
@@ -1254,15 +1476,15 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
         case 12:
 
         // Js
-    // 0 -> 1 3 4
-    // 1 -> 0 2 5
-    // 2 -> 1 3 6
-    // 3 -> 0 2 7
-    // 4 -> 0 5 7
-    // 5 -> 1 4 6
-    // 6 -> 2 5 7
-    // 7 -> 3 4 6
-        
+        // 0 -> 1 3 4
+        // 1 -> 0 2 5
+        // 2 -> 1 3 6
+        // 3 -> 0 2 7
+        // 4 -> 0 5 7
+        // 5 -> 1 4 6
+        // 6 -> 2 5 7
+        // 7 -> 3 4 6
+            
             converted.push_back({indexs[i][0], indexs[i][2], indexs[i][1]});
             converted.push_back({indexs[i][0], indexs[i][3], indexs[i][2]});
             
@@ -1273,13 +1495,13 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
             converted.push_back({indexs[i][3], indexs[i][4], indexs[i][7]});
             
             converted.push_back({indexs[i][4], indexs[i][5], indexs[i][6]});
-            converted.push_back({indexs[i][4], indexs[i][6], indexs[i][7]});
+            converted.push_back({indexs[i][4], indexs[i][7], indexs[i][6]});
 
             converted.push_back({indexs[i][5], indexs[i][1], indexs[i][2]});
             converted.push_back({indexs[i][5], indexs[i][2], indexs[i][6]});
 
             converted.push_back({indexs[i][2], indexs[i][3], indexs[i][7]});
-            converted.push_back({indexs[i][2], indexs[i][7], indexs[i][6]});
+            converted.push_back({indexs[i][2], indexs[i][6], indexs[i][7]});
 
             break;
 
@@ -1302,15 +1524,15 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
             break;
 
         case 13:
-            converted.push_back({indexs[i][0], indexs[i][2], indexs[i][1]});
+            converted.push_back({indexs[i][0], indexs[i][1], indexs[i][2]});
 
-            converted.push_back({indexs[i][0], indexs[i][1], indexs[i][3]});
-            converted.push_back({indexs[i][1], indexs[i][4], indexs[i][3]});
+            converted.push_back({indexs[i][3], indexs[i][0], indexs[i][1]});
+            converted.push_back({indexs[i][3], indexs[i][1], indexs[i][4]});
 
             converted.push_back({indexs[i][3], indexs[i][4], indexs[i][5]});
 
-            converted.push_back({indexs[i][0], indexs[i][3], indexs[i][2]});
-            converted.push_back({indexs[i][2], indexs[i][3], indexs[i][5]});
+            converted.push_back({indexs[i][2], indexs[i][0], indexs[i][3]});
+            converted.push_back({indexs[i][2], indexs[i][5], indexs[i][3]});
 
             converted.push_back({indexs[i][1], indexs[i][5], indexs[i][4]});
             converted.push_back({indexs[i][1], indexs[i][2], indexs[i][5]});
@@ -1328,4 +1550,631 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
 
     return converted;
 
+}
+
+
+// ------------------------------------------------------------- Metricas individuales.
+
+float Hexaedral::CalculateJ_index(int index)
+{
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - (*vertexs_refs[index]).position  );
+    return glm::dot( normalized1, glm::cross( normalized2, normalized3));
+}
+
+float Hexaedral::SimulateMoveJ(int index, const glm::vec3& mov)
+{
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalizedv1 = glm::normalize( (*vertexs_refs[adj_index1]).position - mov );
+    glm::vec3 normalizedv2 = glm::normalize( (*vertexs_refs[adj_index2]).position - mov );
+    glm::vec3 normalizedv3 = glm::normalize( (*vertexs_refs[adj_index3]).position - mov );
+
+    return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+}
+
+float Hexaedral::CalculateJR_index(int index)
+{
+    
+    float JsMax = *max_element(J.begin(), J.end());
+
+    for(float J_: J)
+    {
+        JR.push_back(J_ / JsMax);
+    }
+
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - (*vertexs_refs[index]).position  );
+    return glm::dot( normalized1, glm::cross( normalized2, normalized3));
+}
+
+float Hexaedral::SimulateMoveJR(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 8; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+    // Simular JS
+    for (int index = 0; index < 8; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+        glm::vec3 origin = vertexs_mod[index];
+        glm::vec3 normalized1 = glm::normalize( vertexs_mod[adj_index1] - origin );
+        glm::vec3 normalized2 = glm::normalize( vertexs_mod[adj_index2] - origin );
+        glm::vec3 normalized3 = glm::normalize( vertexs_mod[adj_index3] - origin );
+        simulatedJ.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
+
+    // Calcular JR
+
+    float JsMax = *max_element(simulatedJ.begin(), simulatedJ.end());
+
+    return simulatedJ[index] / JsMax;
+    
+}
+
+float Hexaedral::CalculateJens_index(int index)
+{
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalized1 = glm::normalize( (*vertexs_refs[adj_index1]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized2 = glm::normalize( (*vertexs_refs[adj_index2]).position - (*vertexs_refs[index]).position  );
+    glm::vec3 normalized3 = glm::normalize( (*vertexs_refs[adj_index3]).position - (*vertexs_refs[index]).position  );
+    return glm::dot( normalized1, glm::cross( normalized2, normalized3));
+    
+}
+
+float Hexaedral::SimulateMoveJens(int index, const glm::vec3& mov)
+{
+    return SimulateMoveJ(index, mov);
+}
+
+float Prism::CalculateJ_index(int index)
+{
+    return 0.0f;
+}
+
+float Prism::SimulateMoveJ(int index, const glm::vec3& mov)
+{
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalizedv1 = glm::normalize( (*vertexs_refs[adj_index1]).position - mov );
+    glm::vec3 normalizedv2 = glm::normalize( (*vertexs_refs[adj_index2]).position - mov );
+    glm::vec3 normalizedv3 = glm::normalize( (*vertexs_refs[adj_index3]).position - mov );
+
+    return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+
+}
+
+float Prism::CalculateJR_index(int index)
+{
+    return 0.0f;
+}
+
+float Prism::SimulateMoveJR(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 6; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+    // Simular JS
+    for (int index = 0; index < 6; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+        glm::vec3 origin = vertexs_mod[index];
+        glm::vec3 normalized1 = glm::normalize( vertexs_mod[adj_index1] - origin );
+        glm::vec3 normalized2 = glm::normalize( vertexs_mod[adj_index2] - origin );
+        glm::vec3 normalized3 = glm::normalize( vertexs_mod[adj_index3] - origin );
+        simulatedJ.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
+
+    // Calcular JR
+
+    float JsMax = *max_element(simulatedJ.begin(), simulatedJ.end());
+
+    return simulatedJ[index] / JsMax;
+}
+
+float Prism::CalculateJens_index(int index)
+{
+    return 0.0f;
+}
+
+float Prism::SimulateMoveJens(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 6; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+    // Simular JS
+    for (int index = 0; index < 6; index++) 
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+        glm::vec3 origin = vertexs_mod[index];
+        glm::vec3 normalized1 = glm::normalize( vertexs_mod[adj_index1] - origin );
+        glm::vec3 normalized2 = glm::normalize( vertexs_mod[adj_index2] - origin );
+        glm::vec3 normalized3 = glm::normalize( vertexs_mod[adj_index3] - origin );
+        simulatedJ.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
+
+
+    if (simulatedJ[index] > kens)
+        return (1 + kens) - simulatedJ[index];
+    else if ( -kens <= simulatedJ[index] && simulatedJ[index] <= kens )
+        return simulatedJ[index] / kens;
+    else
+        return -1 * (1+kens) - simulatedJ[index];
+
+}
+
+
+float Pyramid::CalculateJ_index(int index)
+{
+    return 0.0f;
+}
+
+float Pyramid::SimulateMoveJ(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 5; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+
+    // Se trata como un hexaedro mal formado, calculando los 4 puntos gaussianos en la puntos de la piramide.
+    std::vector <glm::vec3> midpoints_mods;
+    midpoints_mods.push_back(glm::mix(vertexs_mod[0], vertexs_mod[4], 0.9f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[1], vertexs_mod[4], 0.9f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[2], vertexs_mod[4], 0.9f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[3], vertexs_mod[4], 0.9f));
+
+    glm::vec3 origin = vertexs_mod[index];
+    if (index == 0)
+    {
+        glm::vec3 normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        glm::vec3 normalizedv2 = glm::normalize( vertexs_mod[3]- origin );
+        glm::vec3 normalizedv3 = glm::normalize( midpoints_mods[0] - origin );
+        return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+    } else if (index == 1)
+    {
+        glm::vec3 normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        glm::vec3 normalizedv2 = glm::normalize( midpoints_mods[1] - origin );
+        glm::vec3 normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+        return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+    } else if (index == 2)
+    {
+        glm::vec3 normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        glm::vec3 normalizedv2 = glm::normalize( midpoints_mods[2] - origin );
+        glm::vec3 normalizedv3 = glm::normalize( vertexs_mod[3] - origin );
+        return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+    } else if (index == 3)
+    {
+        glm::vec3 normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        glm::vec3 normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        glm::vec3 normalizedv3 = glm::normalize( midpoints_mods[3] - origin );
+        return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+    } else
+    {
+        std::vector <float> values_gauss; 
+
+        glm::vec3 normalizedv1, normalizedv2, normalizedv3; 
+        
+        origin = vertexs_mod[4];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[0] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+        
+
+        return *min_element(values_gauss.begin(), values_gauss.end());
+    }
+    
+
+
+
+}
+
+float Pyramid::CalculateJR_index(int index)
+{
+    return 0.0f;
+}
+
+float Pyramid::SimulateMoveJR(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 5; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+
+    // Calcular JS
+    std::vector <glm::vec3> midpoints_mods;
+    midpoints_mods.push_back(glm::mix(vertexs_mod[0], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[1], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[2], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[3], vertexs_mod[4], 0.99f));
+
+    glm::vec3 origin, normalizedv1, normalizedv2, normalizedv3;
+
+        origin = vertexs_mod[0];
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3]- origin );
+        normalizedv3 = glm::normalize( midpoints_mods[0] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    
+        origin = vertexs_mod[1];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( midpoints_mods[1] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        origin = vertexs_mod[2];
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( midpoints_mods[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[3] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    
+        origin = vertexs_mod[3];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( midpoints_mods[3] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        
+        std::vector <float> values_gauss; 
+        
+        origin = vertexs_mod[4];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[0] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+        
+
+    simulatedJ.push_back(*min_element(values_gauss.begin(), values_gauss.end()));
+
+
+    
+    // Calcular JR
+
+    float JsMax = *max_element(simulatedJ.begin(), simulatedJ.end());
+
+    return simulatedJ[index] / JsMax;
+
+}
+
+float Pyramid::CalculateJens_index(int index)
+{
+    return 0.0f;
+}
+
+float Pyramid::SimulateMoveJens(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 5; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+
+    // Calcular JS
+    std::vector <glm::vec3> midpoints_mods;
+    midpoints_mods.push_back(glm::mix(vertexs_mod[0], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[1], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[2], vertexs_mod[4], 0.99f));
+    midpoints_mods.push_back(glm::mix(vertexs_mod[3], vertexs_mod[4], 0.99f));
+
+    glm::vec3 origin, normalizedv1, normalizedv2, normalizedv3;
+
+        origin = vertexs_mod[0];
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3]- origin );
+        normalizedv3 = glm::normalize( midpoints_mods[0] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    
+        origin = vertexs_mod[1];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( midpoints_mods[1] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        origin = vertexs_mod[2];
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( midpoints_mods[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[3] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+    
+        origin = vertexs_mod[3];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( midpoints_mods[3] - origin );
+    simulatedJ.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        
+        std::vector <float> values_gauss; 
+        
+        origin = vertexs_mod[4];
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+
+        normalizedv1 = glm::normalize( vertexs_mod[3] - origin );
+        normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+        normalizedv3 = glm::normalize( vertexs_mod[0] - origin );
+        values_gauss.push_back(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)));
+        
+
+    simulatedJ.push_back(*min_element(values_gauss.begin(), values_gauss.end()));
+
+
+    
+    // Calcular Jens
+
+    float kens_ = 0.0f;
+
+        if (index == 4)
+        {
+            kens_ = kens_apex;
+            glm::vec3 origin, normalizedv1, normalizedv2, normalizedv3;
+            std::vector <float> pos;
+           
+            
+            origin = vertexs_mod[4];
+            normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+            normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+            normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            normalizedv1 = glm::normalize( vertexs_mod[0] - origin );
+            normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+            normalizedv3 = glm::normalize( vertexs_mod[1] - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            normalizedv1 = glm::normalize( vertexs_mod[1] - origin );
+            normalizedv2 = glm::normalize( vertexs_mod[3] - origin );
+            normalizedv3 = glm::normalize( vertexs_mod[2] - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            normalizedv1 = glm::normalize( vertexs_mod[3] - origin );
+            normalizedv2 = glm::normalize( vertexs_mod[2] - origin );
+            normalizedv3 = glm::normalize( vertexs_mod[0] - origin );
+            pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
+
+            bool in_negative = false;
+            for(float pos_: pos)
+            {
+                if(pos_ < 0.0f)
+                    in_negative = true;
+            }
+
+            if(in_negative)
+                return *max_element(pos.begin(), pos.end());
+            else
+                return *min_element(pos.begin(), pos.end());
+
+
+
+        }
+        else 
+        {
+            float J_ = simulatedJ[index];
+            kens_ = kens_base;
+            return CalculateValueJens(J_, kens_);
+        }
+
+
+    
+}
+
+
+float Tetrahedra::CalculateJ_index(int index)
+{
+    return 0.0f;
+}
+
+float Tetrahedra::SimulateMoveJ(int index, const glm::vec3& mov)
+{
+    auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+    glm::vec3 normalizedv1 = glm::normalize( (*vertexs_refs[adj_index1]).position - mov );
+    glm::vec3 normalizedv2 = glm::normalize( (*vertexs_refs[adj_index2]).position - mov );
+    glm::vec3 normalizedv3 = glm::normalize( (*vertexs_refs[adj_index3]).position - mov );
+
+    return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
+}
+
+float Tetrahedra::CalculateJR_index(int index)
+{
+    return 0.0f;
+}
+
+float Tetrahedra::SimulateMoveJR(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 4; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+    // Simular JS
+    for (int index = 0; index < 4; index++) // 8 Vertices de un Hexaedro
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+        glm::vec3 origin = vertexs_mod[index];
+        glm::vec3 normalized1 = glm::normalize( vertexs_mod[adj_index1] - origin );
+        glm::vec3 normalized2 = glm::normalize( vertexs_mod[adj_index2] - origin );
+        glm::vec3 normalized3 = glm::normalize( vertexs_mod[adj_index3] - origin );
+        simulatedJ.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
+
+    // Calcular JR
+
+    float JsMax = *max_element(simulatedJ.begin(), simulatedJ.end());
+
+    return simulatedJ[index] / JsMax;
+}
+
+float Tetrahedra::CalculateJens_index(int index)
+{
+    return 0.0f;
+    
+}
+
+float Tetrahedra::SimulateMoveJens(int index, const glm::vec3& new_pos)
+{
+    std::vector <float> simulatedJ;
+    std::vector <glm::vec3> vertexs_mod;
+
+    // Posiciones con el vector modificado
+    for (int i = 0; i < 4; i++)
+    {
+        if (i == index)
+        {
+            glm::vec3 moved = new_pos;
+            vertexs_mod.push_back(moved);
+        } else {
+            vertexs_mod.push_back( (*vertexs_refs[i]).position);
+        }
+    }
+
+    // Simular JS
+    for (int index = 0; index < 4; index++) 
+    {
+        auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
+
+        glm::vec3 origin = vertexs_mod[index];
+        glm::vec3 normalized1 = glm::normalize( vertexs_mod[adj_index1] - origin );
+        glm::vec3 normalized2 = glm::normalize( vertexs_mod[adj_index2] - origin );
+        glm::vec3 normalized3 = glm::normalize( vertexs_mod[adj_index3] - origin );
+        simulatedJ.push_back(glm::dot( normalized1, glm::cross( normalized2, normalized3)));        
+    }
+
+
+    if (simulatedJ[index] > kens)
+        return (1 + kens) - simulatedJ[index];
+    else if ( -kens <= simulatedJ[index] && simulatedJ[index] <= kens )
+        return simulatedJ[index] / kens;
+    else
+        return -1 * (1+kens) - simulatedJ[index];
 }

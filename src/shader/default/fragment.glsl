@@ -17,30 +17,9 @@ uniform int isVertex;
 
 
 void main() {
-    // Propiedades ambientales
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor;
 
-    // Propiedades difusas
-    vec3 xTangent = dFdx( viewPos );
-    vec3 yTangent = dFdy( viewPos );
-    vec3 faceNormal = normalize( cross( xTangent, yTangent ) );
+    vec3 norm = Normal;
 
-    vec3 norm = normalize(Normal);
-
-    vec3 lightDirection = normalize(-lightDir);
-    float diff = max(dot(norm, lightDirection), 0.0);
-    vec3 diffuse = diff * lightColor;
-
-    // Specular lighting
-    float specularStrength = 0.5;
-    vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDirection, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;
-
-    // Suma de los componentes
-    //vec3 result = (ambient + diffuse + specular)*Color;
     vec3 result = Color;
 
     vec2 coord = gl_PointCoord;
@@ -65,6 +44,6 @@ void main() {
     } else
     {
         //FragColor = vec4(result, 1.0);
-        FragColor = vec4(reflectionColor + vec3(0.3,0.3,0.3), 1.0);
+        FragColor = vec4(reflectionColor + vec3(0.7,0.7,0.7), 1.0);
     }
 }

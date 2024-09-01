@@ -36,6 +36,12 @@ public:
 	void UpdateMeshLines();
 	void UpdateModelGraph();
 
+	std::vector <Tri> tris;
+	std::vector <Vertex> vertices;
+
+	std::vector<glm::vec3> lineVertices;
+
+
 private:
 	void calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles);
 	void renderNormals(const std::vector<Vertex>& vertices);
@@ -68,9 +74,7 @@ private:
     void read_vtk(const std::string&, glm::vec3);
 	std::vector<unsigned char> data;
 
-	std::vector <Tri> tris;
-	std::vector <Vertex> vertices;
-
+	
 	
 	std::vector<glm::vec3> translationsMeshes;
 	std::vector<glm::quat> rotationsMeshes;

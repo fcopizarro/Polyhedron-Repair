@@ -5,7 +5,7 @@
 #include "camera/Camera.hpp"
 #include "shader/shader.hpp"
 #include "models/models.hpp"
-
+class Scene;
 
 class UI
 {
@@ -20,13 +20,14 @@ public:
     SDL_GLContext glContext = NULL;
     //SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
-    void Update(Model&);
+    void Update(Scene&);
 
-    void MainMenu();
+    void MainMenu(Scene&);
     void NormalsMenu();
     void EditVertexMenu(Model&);
     void HistogramMenu();
     void FixMenu(Model& );
+    void PersolizeMenu();
 
     void Destroy();
 
@@ -41,7 +42,6 @@ public:
     std::vector<float> histogramData;
     std::vector<float> histogramLabels;
 
-
     std::vector<float> Jdata, JRdata, JENSdata, EQdata;
     std::vector<float> ARtotal, ARdata, ARGdata, ARENdata;
     
@@ -55,9 +55,13 @@ public:
     bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;
     bool includeHexa2 = true, includeTetra2 = true, includePyra2 = true, includePrism2 = true;
 
+    bool eM = false, jM = false, aM = false, fM = false, pM = false; 
+
+    ImGui::FileBrowser fileDialog;
 
 
 private:
+
 
     bool show_normals = false;
     bool show_demo_window = false;
