@@ -10,14 +10,15 @@ void Polyhedral::GiveColor(glm::vec3 color1, glm::vec3 color2)
     // c1 -> -1
     // c2 -> 1
 
-    std::cout << " AAAAAAAAAAAAAA\n" ;
+    //std::cout << " AAAAAAAAAAAAAA\n" ;
 
+    /*
     for (auto ver: vertexs_refs)
     {
         //(*ver).color = glm::vec3(1.0f, 0.0f, 0.0f);
         std::cout << (*ver).color.x << " "  << (*ver).color.y << " " << (*ver).color.z << std::endl;
     }
-
+    */
 
 }
 
@@ -845,8 +846,8 @@ bool Polyhedral::FixJ(float minJ, int maxtrys)
 
                     (*vertexs_refs[i]).position += dJ_dvi;
 
-                    std::cout << "Nuevo posicion en " << (*vertexs_refs[i]).position.x << "  " << (*vertexs_refs[i]).position.y << "  " << (*vertexs_refs[i]).position.z << std::endl;
-                    std::cout << "Valor antiguo J " << J[i] << std::endl;
+                    //std::cout << "Nuevo posicion en " << (*vertexs_refs[i]).position.x << "  " << (*vertexs_refs[i]).position.y << "  " << (*vertexs_refs[i]).position.z << std::endl;
+                    //std::cout << "Valor antiguo J " << J[i] << std::endl;
 
                 }
                 fix_needed = true;
@@ -1309,7 +1310,7 @@ void Polyhedral_Mesh::FormPolys(const std::vector<Vertex>& vertices)
 {
 
 
-    std::cout << "FormPolys call\nTamano types: " << types.size() << std::endl;
+    //std::cout << "FormPolys call\nTamano types: " << types.size() << std::endl;
 
     for (int i = 0; i < types.size(); i++)
     {
@@ -1362,6 +1363,7 @@ void Polyhedral_Mesh::toString()
 {
     std::cout << "\n\nResumen Polyhedros\n N vertices: " << vertexs.size() << std::endl; 
 
+    /*
     std::cout << "Imprimiendo vertices" << std::endl;
 
     for (int i = 0; i < vertexs.size(); i++)
@@ -1441,7 +1443,7 @@ void Polyhedral_Mesh::toString()
     std::cout << std::endl;
 
     std::cout << "\n\n\n" << std::endl;
-    
+    */
 }
 
 std::vector<Vertex> Polyhedral_Mesh::toVertex()

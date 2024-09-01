@@ -6,6 +6,9 @@ project(MemoriaIci VERSION 1.0)
 # Especifica el estándar de C++ requerido
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 
 set(local_root ${CMAKE_CURRENT_SOURCE_DIR})
 
