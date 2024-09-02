@@ -1,6 +1,20 @@
 # MemoriaICI
-sdaasdsd
-INSTALAR MSYS2++wsdfgvwsdgvaasd}asasdvv
+
+GDB
+
+sudo apt-get install build-essential gdb
+
+Se Compila con CMAKE
+sudo apt install cmake
+
+Instalara SDL2 Ubuntu
+sudo apt-get install libsdl2-dev
+
+Instalar GLEW Ubuntu
+sudo apt-get install libglew-dev
+
+Platform Backend SDL2
+Renderer Backend OpenGL
 
 
 pacman -S mingw-w64-x86_64-gcc
