@@ -19,7 +19,8 @@ Renderer Backend OpenGL
 Intalar GLM
 sudo apt-get install libglm-dev
 
-
+Instalar Mesa-Utils
+sudo apt-get install mesa-utils
 
 pacman -S mingw-w64-x86_64-gcc
 
