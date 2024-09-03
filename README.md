@@ -16,6 +16,10 @@ sudo apt-get install libglew-dev
 Platform Backend SDL2
 Renderer Backend OpenGL
 
+Intalar GLM
+sudo apt-get install libglm-dev
+
+
 
 pacman -S mingw-w64-x86_64-gcc
 
