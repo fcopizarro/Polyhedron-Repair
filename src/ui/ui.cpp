@@ -507,9 +507,9 @@ void UI::MainMenu(Scene& scene)
 
     ImGui::Text("\nInformacion de la Malla");
 
-    ImGui::Text("\nN° de vertices: %i", scene.model->vertices.size());
+    ImGui::Text("\nN° de vertices: %zu", scene.model->vertices.size());
 
-    ImGui::Text("\nN° de poliedros: %i", scene.model->polyMesh.polys.size());
+    ImGui::Text("\nN° de poliedros: %zu", scene.model->polyMesh.polys.size());
     ImGui::Text(" %i Hexaedra", qtyHexa);
     ImGui::Text(" %i Tetrahedra", qtyTetra);
     ImGui::Text(" %i Pyramid", qtyPyra);

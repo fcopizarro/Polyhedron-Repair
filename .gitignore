@@ -1,3 +1,4 @@
-/build/*
+build/*
 build/*
 deps/imgui and implot
+/.vscode

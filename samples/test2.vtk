@@ -1,0 +1,31 @@
+# vtk DataFile Version 2.0
+Unstructured Grid Example
+ASCII
+
+DATASET UNSTRUCTURED_GRID
+
+POINTS 12 float
+0 0 0
+1 0 0
+1 1 0
+0 1 0
+0 0 1
+1 0 1
+1 1 1
+0 1 1
+2 0 0
+2 1 0
+2 0 1
+2 1 1
+
+CELLS 4 24
+8 0 1 2 3 4 5 6 7
+4 1 8 9 2
+5 8 9 11 10 6
+6 0 1 9 8 4 5
+
+CELL_TYPES 4
+12
+10
+14
+13

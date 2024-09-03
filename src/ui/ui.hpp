@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 #include "camera/Camera.hpp"
-#include "shader/shader.hpp"
+#include "shader/Shader.hpp"
 #include "models/models.hpp"
 class Scene;
 

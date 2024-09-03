@@ -20,6 +20,16 @@ void search_bb(const OctreeNode* octree, std::vector <BoundingBox> & bb)
     }
 }
 
+bool is_line_empty(std::string line)
+{
+  // Funcion para saber si una linea esta vacia en Unix o Windows
+  // LF & CRLF & CR
+
+  if (line.empty() || line.find_first_not_of(" \t\r\n") == std::string::npos)
+    return true;
+  return false;
+}
+
 Model::Model(const OctreeNode* octree, glm::vec3 color)
 {
 
@@ -401,50 +411,72 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
 
 
     bool debug = true;
+    
+    
+    // VTK HEADERS:
+    // - VTK Version
+    // - VTK Name
+    // - File Codification
+    // - Dataset Structure
+    
+    std::string version = "";
+    std::string name = "";
+    std::string cod = "";
+    std::string dataset  = "";
+    
 
     // leer cabecera.
     while (std::getline(file, line)) {
 
-        if(line.empty())
+        if (is_line_empty(line))
+        {
+            std::cout << "Empty line." << std::endl;
             continue;
-
-
-        if (line_count == 1)
-        {
-            // get name
         }
-
-        if (line_count == 2)
+        
+        if(version.empty()) 
         {
-            // get coding
+          version = line;
+          std::cout << "+++++++++" << line << std::endl;
+          continue;
         }
-
-        if (line_count == 3)
+        
+        if (name.empty())
         {
-            structure = line;
-            break;
+          name = line;
+          std::cout << "+++++++++" << line << std::endl;
+          continue;
         }
-
-
-        if(!line.empty())
-            line_count ++;
-
-
+        
+        if (cod.empty())
+        {
+          cod = line;
+          std::cout << "+++++++++" << line << std::endl;
+          continue;
+        }
+        
+        if (dataset.empty())
+        {
+          dataset = line;
+          std::cout << "+++++++++" << line << std::endl;
+          break;
+        }
     }
-
-    //if (debug)
-    //    std::cout << "DEBUG: " << line << std::endl;
+    
+    
+    // Conseguir Encabezado POINTS NUM_PUNTOS TIPO_DE_DATO
+  
 
     std::string points, tipo;
     int points_num;
     
-    // Conseguir Encabezado POINTS NUM_PUNTOS TIPO_DE_DATO
     while (!points_getted)
     {
         std::getline(file, line); // cantidad de puntos
+        std::cout << "-----------" << line << std::endl;
         std::istringstream iss(line);
 
-        if(line.empty())
+        if (is_line_empty(line))
             continue;
 
         iss >> points >> points_num >> tipo;
@@ -509,7 +541,7 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
         std::getline(file, line); // cantidad de puntos
         std::istringstream iss_cells(line);
 
-        if(line.empty())
+        if (is_line_empty(line))
             continue;
 
         iss_cells >> cells >> n_cells >> n_indexs;
@@ -562,7 +594,7 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
         std::getline(file, line); // cantidad de puntos
         std::istringstream iss_cells(line);
 
-        if(line.empty())
+        if (is_line_empty(line))
             continue;
 
         iss_cells >> cells_types >> n_cells_types;

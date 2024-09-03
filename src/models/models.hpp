@@ -5,7 +5,6 @@
 #include "shader/Shader.hpp"
 
 
-#include "mesh/mesh.hpp"
 #include "mesh/octree.hpp"
 #include "models/polyhedral.hpp"
 
