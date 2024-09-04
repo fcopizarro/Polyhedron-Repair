@@ -1,5 +1,9 @@
 # MemoriaICI
 
+Clonar el repositorio y sus dependencias
+
+git clone https://github.com/fcopizarro/MemoriaICI/ --recursive --j8
+
 GDB
 
 sudo apt-get install build-essential gdb
