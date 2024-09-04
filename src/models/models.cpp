@@ -473,11 +473,14 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
     while (!points_getted)
     {
         std::getline(file, line); // cantidad de puntos
-        std::cout << "-----------" << line << std::endl;
-        std::istringstream iss(line);
-
+        // std::cout << "-----------" << line << std::endl;
+        
         if (is_line_empty(line))
             continue;
+            
+        std::istringstream iss(line);
+
+        
 
         iss >> points >> points_num >> tipo;
         //std::cout << "Puntos " <<  points_num << std::endl;

@@ -5,11 +5,14 @@
 #include "camera/Camera.hpp"
 #include "shader/Shader.hpp"
 #include "models/models.hpp"
+#include <math.h>
 class Scene;
 
 class UI
 {
 public:
+
+    // Constructor: Inicilizar la ventana y la interfaz de usuario
     UI (const unsigned int width, const unsigned int height);
 
     unsigned int width;
@@ -18,14 +21,13 @@ public:
     SDL_Window* window = NULL;
     SDL_Renderer* renderer = NULL;
     SDL_GLContext glContext = NULL;
-    //SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
     void Update(Scene&);
-
     void MainMenu(Scene&);
     void NormalsMenu();
     void EditVertexMenu(Model&);
     void HistogramMenu();
+    void RatioMenu();
     void FixMenu(Model& );
     void PersolizeMenu();
 
@@ -55,14 +57,15 @@ public:
     bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;
     bool includeHexa2 = true, includeTetra2 = true, includePyra2 = true, includePrism2 = true;
 
-    bool eM = false, jM = false, aM = false, fM = false, pM = false; 
-
-    ImGui::FileBrowser fileDialog;
-
+    
 
 private:
 
+    ImGui::FileBrowser fileDialog;
 
+    // Variables para gestionar los menus activos en pantalla.
+    bool editMenu = false, metricsMenu = false, ratioMenu = false, fixMenu = false, customizeMenu = false; 
+    
     bool show_normals = false;
     bool show_demo_window = false;
     bool show_another_window = false;

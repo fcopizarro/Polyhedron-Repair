@@ -2,101 +2,107 @@
 #include "scene/scene.hpp"
 
 
-#include <math.h>
+/**
+ * @class UI
+ * @brief Clase que representa una interfaz de usuario gráfica.
+ *
+ * Este constructor inicializa la ventana gráfica utilizando SDL y configura 
+ * OpenGL para el renderizado. Activa características como el buffer de profundidad 
+ * y el antialiasing (MSAA).
+ *
+ * @param width: Ancho inicial de la ventana en píxeles.
+ * @param height: Altura inicial de la ventana en píxeles.
+ */
+UI::UI (const unsigned int width, const unsigned int height)
+{ 
+    // Asignar las dimensiones iniciales de la ventana
+    this->width = width;
+    this->height = height;
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        printf("Error inicializando SDL: %s\n", SDL_GetError());
+    }
+    
+    // Configurar SDL para el uso de MSAA
+    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0) {
+        printf("Error configurando SDL_GL_MULTISAMPLEBUFFERS: %s\n", SDL_GetError());
+    }
+    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4) < 0) {
+        printf("Error configurando SDL_GL_MULTISAMPLESAMPLES: %s\n", SDL_GetError());
+    }
+    
+
+    // Crear la ventana
+    window = SDL_CreateWindow("SDL VTK Viewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
+    if (!window) {
+        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
+    }
+
+    SDL_GLContext glContext = SDL_GL_CreateContext(window);
+    if (!glContext) {
+        std::cerr << "Error al crear el contexto OpenGL: " << SDL_GetError() << std::endl;
+    }
+    
+    glewExperimental = GL_TRUE;
+
+    if (glewInit() != GLEW_OK) {
+        std::cout << "Failed to initialize GLEW" << std::endl;
+    }
 
 
-double RandomGauss() {
-	static double V1, V2, S;
-	static int phase = 0;
-	double X;
-	if(phase == 0) {
-		do {
-			double U1 = (double)rand() / RAND_MAX;
-			double U2 = (double)rand() / RAND_MAX;
-			V1 = 2 * U1 - 1;
-			V2 = 2 * U2 - 1;
-			S = V1 * V1 + V2 * V2;
-			} while(S >= 1 || S == 0);
+    SDL_GL_SetSwapInterval(0); 
+    SDL_GL_MakeCurrent(window, glContext);
+    glViewport( 0, 0, width, height );
 
-		X = V1 * sqrt(-2 * log(S) / S);
-	} else
-		X = V2 * sqrt(-2 * log(S) / S);
-	phase = 1 - phase;
-	return X;
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImPlot::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    ImGui::StyleColorsDark();
+    ImGui_ImplSDL2_InitForOpenGL(window, glContext);
+    ImGui_ImplOpenGL3_Init("#version 150");
+
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEPTH_TEST);
+    
+
+    glEnable(GL_FLAT);
+    glShadeModel(GL_FLAT);
+
+    //glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
+    
+    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
+    
+
 }
 
-template <int N>
-struct NormalDistribution {
-    NormalDistribution(double mean, double sd) {
-        for (int i = 0; i < N; ++i)
-            Data[i] = RandomGauss()*sd + mean;
-    }
-    double Data[N];
-};
+void UI::Update(Scene& scene) 
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
 
-void Demo_Histogram() {
+    MainMenu(scene);
 
-    static ImPlotHistogramFlags hist_flags = ImPlotHistogramFlags_Density;
-    static int  bins       = 50;
-    static double mu       = 5;
-    static double sigma    = 2;
-    ImGui::SetNextItemWidth(200);
-    if (ImGui::RadioButton("Sqrt",bins==ImPlotBin_Sqrt))       { bins = ImPlotBin_Sqrt;    } ImGui::SameLine();
-    if (ImGui::RadioButton("Sturges",bins==ImPlotBin_Sturges)) { bins = ImPlotBin_Sturges; } ImGui::SameLine();
-    if (ImGui::RadioButton("Rice",bins==ImPlotBin_Rice))       { bins = ImPlotBin_Rice;    } ImGui::SameLine();
-    if (ImGui::RadioButton("Scott",bins==ImPlotBin_Scott))     { bins = ImPlotBin_Scott;   } ImGui::SameLine();
-    if (ImGui::RadioButton("N Bins",bins>=0))                  { bins = 50;                }
-    if (bins>=0) {
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(200);
-        ImGui::SliderInt("##Bins", &bins, 1, 100);
-    }
-    ImGui::CheckboxFlags("Horizontal", (unsigned int*)&hist_flags, ImPlotHistogramFlags_Horizontal);
-    ImGui::SameLine();
-    ImGui::CheckboxFlags("Density", (unsigned int*)&hist_flags, ImPlotHistogramFlags_Density);
-    ImGui::SameLine();
-    ImGui::CheckboxFlags("Cumulative", (unsigned int*)&hist_flags, ImPlotHistogramFlags_Cumulative);
+    NormalsMenu();
 
-    static bool range = false;
-    ImGui::Checkbox("Range", &range);
-    static float rmin = -3;
-    static float rmax = 13;
-    if (range) {
-        ImGui::SameLine();
-        ImGui::SetNextItemWidth(200);
-        ImGui::DragFloat2("##Range",&rmin,0.1f,-3,13);
-        ImGui::SameLine();
-        ImGui::CheckboxFlags("Exclude Outliers", (unsigned int*)&hist_flags, ImPlotHistogramFlags_NoOutliers);
-    }
-    static NormalDistribution<10000> dist(mu, sigma);
-    static double x[100];
-    static double y[100];
-    if (hist_flags & ImPlotHistogramFlags_Density) {
-        for (int i = 0; i < 100; ++i) {
-            x[i] = -3 + 16 * (double)i/99.0;
-            y[i] = exp( - (x[i]-mu)*(x[i]-mu) / (2*sigma*sigma)) / (sigma * sqrt(2*3.141592653589793238));
-        }
-        if (hist_flags & ImPlotHistogramFlags_Cumulative) {
-            for (int i = 1; i < 100; ++i)
-                y[i] += y[i-1];
-            for (int i = 0; i < 100; ++i)
-                y[i] /= y[99];
-        }
-    }
+    EditVertexMenu(*scene.model);
+    FixMenu(*scene.model);
 
-    if (ImPlot::BeginPlot("##Histograms")) {
-        ImPlot::SetupAxes(nullptr,nullptr,ImPlotAxisFlags_AutoFit,ImPlotAxisFlags_AutoFit);
-        ImPlot::SetNextFillStyle(IMPLOT_AUTO_COL,0.5f);
-        ImPlot::PlotHistogram("Empirical", dist.Data, 10000, bins, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(), hist_flags);
-        if ((hist_flags & ImPlotHistogramFlags_Density) && !(hist_flags & ImPlotHistogramFlags_NoOutliers)) {
-            if (hist_flags & ImPlotHistogramFlags_Horizontal)
-                ImPlot::PlotLine("Theoretical",y,x,100);
-            else
-                ImPlot::PlotLine("Theoretical",x,y,100);
-        }
-        ImPlot::EndPlot();
-    }
+    PersolizeMenu();
 
+
+
+    HistogramMenu();
+
+    fileDialog.Display();
+
+
+    
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    SDL_GL_SwapWindow(window);
 }
 
 
@@ -104,10 +110,10 @@ void Demo_Histogram() {
 void UI::HistogramMenu()
 {
 
-    if (jM)
+    if (metricsMenu)
     {
 
-    if(ImGui::Begin("Jacobian Metrics", &jM)) {
+    if(ImGui::Begin("Jacobian Metrics", &metricsMenu)) {
         ImGui::SetNextItemWidth(200);
         if (ImGui::RadioButton("N Bins",binsJ>=0))                  { binsJ = 50;}
         if (binsJ>=0) {
@@ -193,11 +199,17 @@ void UI::HistogramMenu()
 
     }
     ImGui::End();
-    }
+  }
+}
 
-    if (aM)
+
+void UI::RatioMenu()
+{
+
+
+    if (ratioMenu)
     {
-    if(ImGui::Begin("Aspect Ratio Metrics", &aM)) {
+    if(ImGui::Begin("Aspect Ratio Metrics", &ratioMenu)) {
         ImGui::SetNextItemWidth(200);
         if (ImGui::RadioButton("N Bins",binsAR>=0))                  { binsAR = 50;}
         if (binsAR>=0) {
@@ -271,101 +283,6 @@ void UI::HistogramMenu()
     }
 }
 
-UI::UI (const unsigned int width,const unsigned int height)
-{
-    this->width = width;
-    this->height = height;
-
-    glEnable(GL_MULTISAMPLE);
-    // Enables the Depth Buffer
-    glEnable(GL_DEPTH_TEST);
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("Error inicializando SDL: %s\n", SDL_GetError());
-    }
-    
-    // Configurar SDL para utilizar MSAA
-    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1) < 0) {
-        printf("Error configurando SDL_GL_MULTISAMPLEBUFFERS: %s\n", SDL_GetError());
-    }
-    if (SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4) < 0) {
-        printf("Error configurando SDL_GL_MULTISAMPLESAMPLES: %s\n", SDL_GetError());
-    }
-    
-
-    // Crear la ventana
-    window = SDL_CreateWindow("SDL VTK Viewer", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_OPENGL);
-    if (!window) {
-        std::cerr << "Error al crear la ventana: " << SDL_GetError() << std::endl;
-    }
-
-    SDL_GLContext glContext = SDL_GL_CreateContext(window);
-    if (!glContext) {
-        std::cerr << "Error al crear el contexto OpenGL: " << SDL_GetError() << std::endl;
-    }
-    
-    glewExperimental = GL_TRUE;
-
-    if (glewInit() != GLEW_OK) {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-    }
-
-
-    SDL_GL_SetSwapInterval(0); 
-    SDL_GL_MakeCurrent(window, glContext);
-    glViewport( 0, 0, width, height );
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImPlot::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    ImGui::StyleColorsDark();
-    ImGui_ImplSDL2_InitForOpenGL(window, glContext);
-    ImGui_ImplOpenGL3_Init("#version 150");
-
-    glEnable(GL_MULTISAMPLE);
-    // Enables the Depth Buffer
-    glEnable(GL_DEPTH_TEST);
-    
-
-    glEnable(GL_FLAT);
-    glShadeModel(GL_FLAT);
-
-    //glEnable(GL_NORMALIZE);   // Normalizar normales automáticamente
-    
-    glProvokingVertex(GL_FIRST_VERTEX_CONVENTION);
-    
-
-}
-
-void UI::Update(Scene& scene) 
-{
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-
-    MainMenu(scene);
-
-    NormalsMenu();
-
-    EditVertexMenu(*scene.model);
-    FixMenu(*scene.model);
-
-    PersolizeMenu();
-
-
-
-    HistogramMenu();
-
-    fileDialog.Display();
-
-
-    
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    SDL_GL_SwapWindow(window);
-}
 
 void UI::MainMenu(Scene& scene)
 {
@@ -472,38 +389,9 @@ void UI::MainMenu(Scene& scene)
             ARENdata = scene.model->polyMesh.ARENdata;
     }
 
-    /*
-    if (ImGui::Button("Crear Octree"))
-    {
-        std::cout << "Creando Octree" << std::endl;
-        createOctree = true;
-
-        OctreeNode* octree = new OctreeNode(BoundingBox (models_loaded[0].boundary.min, models_loaded[0].boundary.max), 0, 4);
-        octree->subdivide(models_loaded[0].get_vertices());
-        Model octree_model(octree);
-        models_loaded.push_back(octree_model);
-        models_loaded[0].display = false;
-
-    }
-    */
-
    if(scene.model_in_scene)
    {
-    ImGui::Text("Malla cargada desde:\n%s", scene.model->filename.c_str());               // Display some text (you can use a format strings too)
-
-    /*
-    ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-    ImGui::Checkbox("Another Window", &show_another_window);
-
-    ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-    ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-    if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        counter++;
-    ImGui::SameLine();
-    ImGui::Text("counter = %d", counter);
-    */
-   
+    ImGui::Text("Malla cargada desde:\n%s", scene.model->filename.c_str());
 
     ImGui::Text("\nInformacion de la Malla");
 
@@ -517,15 +405,15 @@ void UI::MainMenu(Scene& scene)
 
 
     ImGui::Text("\n\nMenús");
-    ImGui::Checkbox("Edición", &eM);
+    ImGui::Checkbox("Edición", &editMenu);
     ImGui::SameLine();
-    ImGui::Checkbox("Metricas Jacobianas", &jM);
-    ImGui::Checkbox("Metricas AR", &aM);
+    ImGui::Checkbox("Metricas Jacobianas", &metricsMenu);
+    ImGui::Checkbox("Metricas AR", &ratioMenu);
     ImGui::SameLine();
-    ImGui::Checkbox("Reparación", &fM);
+    ImGui::Checkbox("Reparación", &fixMenu);
 
     ImGui::Text("\n");
-    ImGui::Checkbox("Personalización", &pM);
+    ImGui::Checkbox("Personalización", &customizeMenu);
 
 
 
@@ -542,12 +430,12 @@ void UI::MainMenu(Scene& scene)
 
 void UI::EditVertexMenu(Model& model)
 {
-    if (eM){
+    if (editMenu){
 
     ImGui::SetNextWindowSize(ImVec2((float)300.0f, (float)250.0f));
     ImGui::SetNextWindowPos(ImVec2((float)width - 250.0f - 10.0f , 0));
 
-    ImGui::Begin("Menu Edicion" , &eM);                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Menu Edicion" , &editMenu);                          // Create a window called "Hello, world!" and append into it.
     
     ImGui::Checkbox("Modo Edición", &editMode);
 
@@ -605,9 +493,9 @@ void UI::EditVertexMenu(Model& model)
 void UI::PersolizeMenu()
 {
     
-    if (pM)
+    if (customizeMenu)
     {
-    ImGui::Begin("Menu Personalización", &pM);                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Menu Personalización", &customizeMenu);                          // Create a window called "Hello, world!" and append into it.
     
     
 
@@ -652,10 +540,10 @@ void UI::NormalsMenu()
 
 void UI::FixMenu(Model& model) 
 {
-    if (fM)
+    if (fixMenu)
     {
     static float scaleFix = 0.0f;
-    ImGui::Begin("Menu Fix", &fM);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+    ImGui::Begin("Menu Fix", &fixMenu);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
     //ImGui::Checkbox("Visualizarlas", &show_normals);
     //ImGui::SliderFloat("float", &normal_scale, 0.0f, 10.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
     //ImGui::ColorEdit3("clear color", (float*)&normals_color);
