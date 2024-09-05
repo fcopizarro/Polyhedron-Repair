@@ -1,107 +1,57 @@
-#include "models.hpp"
+#include "mesh.hpp"
 #include "polyhedral.hpp"
 
-void search_bb(const OctreeNode* octree, std::vector <BoundingBox> & bb)
-{
-    if (octree->divided)
-    {
-        for (auto oct: octree->children)
-        {
-            search_bb(oct, bb);
-        }
-    }
-    
-    if (!octree->divided)
-    {
-        if (octree->depth == octree->max_depth && octree->to_convert)
-        {
-            bb.push_back(octree->boundary);
-        }
-    }
-}
-
+/**
+ * @brief Verifica si una línea de texto está vacía.
+ * 
+ * Esta función determina si una línea de texto está vacía o contiene solo caracteres de espacio en blanco, tabulaciones,
+ * retornos de carro (CR) y saltos de línea (LF). Es compatible con los diferentes formatos de salto de línea utilizados en Unix
+ * y Windows.
+ * 
+ * Se consideran caracteres en blanco los siguientes:
+ * - Espacios (espacio en blanco)
+ * - Tabulaciones (tab)
+ * - Retornos de carro (CR)
+ * - Saltos de línea (LF)
+ * 
+ * @param line La línea de texto a verificar.
+ * 
+ * @return `true` si la línea está vacía o solo contiene caracteres en blanco, `false` en caso contrario.
+ */
 bool is_line_empty(std::string line)
 {
-  // Funcion para saber si una linea esta vacia en Unix o Windows
-  // LF & CRLF & CR
-
   if (line.empty() || line.find_first_not_of(" \t\r\n") == std::string::npos)
     return true;
   return false;
 }
 
-Model::Model(const OctreeNode* octree, glm::vec3 color)
-{
 
-    std::vector<BoundingBox> bb;
-    search_bb(octree, bb);
-
-    int i = 1;
-
-    for(BoundingBox bb_: bb)
-    {
-        i++;
-
-        int index_ = vertices.size();
-
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.min.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.min.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.max.y, bb_.min.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.min.y, bb_.max.z), glm::vec3(0.0f), color});
-        vertices.push_back({ glm::vec3(bb_.max.x, bb_.max.y, bb_.max.z), glm::vec3(0.0f), color});
-
-
-        tris.push_back({index_, index_ + 1, index_ + 2});
-        tris.push_back({index_ + 1, index_ + 2, index_ + 4});
-        tris.push_back({index_, index_ + 1, index_ + 6});
-        tris.push_back({index_, index_ + 3, index_ + 6});
-        tris.push_back({index_, index_ + 2, index_ + 3});
-        tris.push_back({index_ + 2, index_ + 3, index_ + 5});
-        tris.push_back({index_ + 2, index_ + 5, index_ + 7});
-        tris.push_back({index_ + 2, index_ + 4, index_ + 7});
-        tris.push_back({index_ + 5, index_ + 3, index_ + 6});
-        tris.push_back({index_ + 5, index_ + 7, index_ + 6});
-        tris.push_back({index_ + 1, index_ + 4, index_ + 6});
-        tris.push_back({index_ + 4, index_ + 7, index_ + 6});
-        
-    }
-
-    BindShader();
-
-
-    //meshes.push_back(Mesh(vertices, tris, octree->boundary.min,  octree->boundary.max));
-}
-
-
-Model::Model(const std::string& file_, glm::vec3 color)
+Mesh::Mesh(const std::string& file_)
 {
     filename = file_;
     std::cout << filename << std::endl;
 
     std::string model_ext = obtenerExtension(filename);
 
-    bool model_loaded = true;
+    bool mesh_loaded = true;
     
     if (model_ext == "obj")
     {
-        read_obj(filename, color);
+        read_obj(filename);
         boundary = BoundingBox(min, max);
         
     } else if (model_ext == "vtk")
     {
-        read_vtk(filename, color);
+        read_vtk(filename);
         boundary = BoundingBox(min, max);
     }
     else
     {
-        model_loaded = false;
+        mesh_loaded = false;
         std::cout << "Formato no soportado " << model_ext << std::endl;
     }
 
-    if (model_loaded)
+    if (mesh_loaded)
         BindShader();
     
 
@@ -110,7 +60,7 @@ Model::Model(const std::string& file_, glm::vec3 color)
 
 }
 
-void Model::BindShader()
+void Mesh::BindShader()
 {
 
     calculateFaceNormals(vertices, tris);
@@ -129,8 +79,6 @@ void Model::BindShader()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
     glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, color));
-    glEnableVertexAttribArray(2);
 
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(3);
@@ -152,7 +100,7 @@ void Model::BindShader()
 }
 
 
-void Model::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles)
+void Mesh::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector<Tri>& triangles)
 {
     for (auto& vertex : vertices) {
         vertex.normal = glm::vec3(0.0f);
@@ -189,7 +137,7 @@ void Model::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vecto
 
 
 
-std::string Model::obtenerExtension(const std::string& nombreArchivo) {
+std::string Mesh::obtenerExtension(const std::string& nombreArchivo) {
     // Buscar el último punto en el nombre del archivo
     size_t puntoPos = nombreArchivo.find_last_of('.');
     
@@ -203,7 +151,7 @@ std::string Model::obtenerExtension(const std::string& nombreArchivo) {
 }
 
 
-void Model::setVertexPosition(int index, float x, float y, float z)
+void Mesh::setVertexPosition(int index, float x, float y, float z)
 {
     vertices[index].position = glm::vec3(x, y, z);
 
@@ -221,7 +169,7 @@ void Model::setVertexPosition(int index, float x, float y, float z)
 
 }
 
-void Model::UpdateModelGraph()
+void Mesh::UpdateModelGraph()
 {
     
     glBindBuffer(GL_ARRAY_BUFFER, ID_VBO);
@@ -237,12 +185,12 @@ void Model::UpdateModelGraph()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-std::vector <Vertex> Model::get_vertices()
+std::vector <Vertex> Mesh::get_vertices()
 {
     return vertices;
 }
 
-std::vector <Tri> Model::get_tris()
+std::vector <Tri> Mesh::get_tris()
 {
     return tris;
 }
@@ -270,7 +218,7 @@ void updateMinMax(glm::vec3& min, glm::vec3& max, float x, float y, float z)
 
 }
 
-void Model::read_obj(const std::string& filename, glm::vec3 color)
+void Mesh::read_obj(const std::string& filename)
 {
     std::ifstream file(filename);
         if (!file.is_open()) {
@@ -297,7 +245,7 @@ void Model::read_obj(const std::string& filename, glm::vec3 color)
 
                 updateMinMax(min_, max_, x, y, z);
 
-                Vertex ver = { glm::vec3(x, y, z), glm::vec3(0.0f), color};
+                Vertex ver = { glm::vec3(x, y, z), glm::vec3(0.0f)};
 
                 vertices.push_back(ver);
 
@@ -380,7 +328,7 @@ void Model::read_obj(const std::string& filename, glm::vec3 color)
 
 
 
-void Model::read_vtk(const std::string& filename, glm::vec3 color)
+void Mesh::read_vtk(const std::string& filename)
 {
 
     float min_value = std::numeric_limits<float>::lowest();
@@ -648,7 +596,7 @@ void Model::read_vtk(const std::string& filename, glm::vec3 color)
 
 }
 
-void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
+void Mesh::Draw(Shader& shader, Camera& camera, bool editmode, int selected_vertex)
 {   
     shader.Activate();
 
@@ -656,8 +604,6 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 2);
     Draw_normals();
     DrawMeshLines();
-
-    //silhouette();
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 0);
 
@@ -668,12 +614,28 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
 
     if (editmode)
     {
+      glPointSize(10.0f); // Configurar tamaño del punto
+        if (selected_vertex != -1)
+        {
+        
+          glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 3);
+          glBindVertexArray(ID_VAO);
+          glDrawArrays(GL_POINTS, selected_vertex, selected_vertex);
+          
+
+          glBindVertexArray(0);
+        }
+        
+        else
+        {
         glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 1);
         glBindVertexArray(ID_VAO);
-        glPointSize(10.0f); // Configurar tamaño del punto
         glDrawArrays(GL_POINTS, 0, vertices.size());
 
         glBindVertexArray(0);
+        }
+        
+        
     }
 
     
@@ -681,7 +643,7 @@ void Model::Draw(Shader& shader, Camera& camera, bool wireframe, bool editmode)
     
 }
 
-void Model::silhouette()
+void Mesh::silhouette()
 {
     glBindVertexArray(ID_VAO);
 
@@ -694,7 +656,7 @@ void Model::silhouette()
     glBindVertexArray(0);
 }
 
-void Model::renderNormals(const std::vector<Vertex>& vertices) {
+void Mesh::renderNormals(const std::vector<Vertex>& vertices) {
     
     /*
     std::vector<glm::vec3> lineVertices2;
@@ -724,7 +686,7 @@ void Model::renderNormals(const std::vector<Vertex>& vertices) {
     */
 }
 
-void Model::updateNormals() {
+void Mesh::updateNormals() {
     std::vector<glm::vec3> lineVertices2;
     for (const auto& vertex : vertices) {
         lineVertices2.push_back(vertex.position);
@@ -738,7 +700,7 @@ void Model::updateNormals() {
 }
 
 
-void Model::Draw_normals()
+void Mesh::Draw_normals()
 {   
 	glBindVertexArray(vaoLines);
     glDrawArrays(GL_LINES, 0, vertices.size() * 2);
@@ -746,7 +708,7 @@ void Model::Draw_normals()
     glBindVertexArray(0);
 }
 
-void Model::BindMeshLines()
+void Mesh::BindMeshLines()
 {
     lineVertices.clear();
     
@@ -891,7 +853,7 @@ void Model::BindMeshLines()
     glBindVertexArray(0);
 }
 
-void Model::UpdateMeshLines()
+void Mesh::UpdateMeshLines()
 {
     lineVertices.clear();
     
@@ -1024,7 +986,7 @@ void Model::UpdateMeshLines()
     
 }
 
-void Model::DrawMeshLines()
+void Mesh::DrawMeshLines()
 {
     glBindVertexArray(vaoMeshLines);
     glLineWidth(2.0f);

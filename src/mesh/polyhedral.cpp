@@ -1,26 +1,7 @@
 #include "polyhedral.hpp"
 
 Polyhedral::Polyhedral(const std::vector<Vertex*>& a)
-{
-    
-}
-
-void Polyhedral::GiveColor(glm::vec3 color1, glm::vec3 color2)
-{   
-    // c1 -> -1
-    // c2 -> 1
-
-    //std::cout << " AAAAAAAAAAAAAA\n" ;
-
-    /*
-    for (auto ver: vertexs_refs)
-    {
-        //(*ver).color = glm::vec3(1.0f, 0.0f, 0.0f);
-        std::cout << (*ver).color.x << " "  << (*ver).color.y << " " << (*ver).color.z << std::endl;
-    }
-    */
-
-}
+{}
 
 
 Hexaedral::Hexaedral(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
@@ -30,27 +11,26 @@ Hexaedral::Hexaedral(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
 
 std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
 {
-    //std::cout << "Called from Hexa GetAdjs" << std::endl;
     switch (index)
     {
-    case 0:
-        return {1, 3, 4};
-    case 1:
-        return {0, 5, 2};
-    case 2:
-        return {1, 6, 3};
-    case 3:
-        return {0, 2, 7};
-    case 4:
-        return {0, 7, 5};
-    case 5:
-        return {1, 4, 6};
-    case 6:
-        return {2, 5, 7};
-    case 7:
-        return {3, 6, 4};
-    default:
-        return {0, 0, 0};
+      case 0:
+          return {1, 3, 4};
+      case 1:
+          return {0, 5, 2};
+      case 2:
+          return {1, 6, 3};
+      case 3:
+          return {0, 2, 7};
+      case 4:
+          return {0, 7, 5};
+      case 5:
+          return {1, 4, 6};
+      case 6:
+          return {2, 5, 7};
+      case 7:
+          return {3, 6, 4};
+      default:
+          return {0, 0, 0};
     }
 
 }

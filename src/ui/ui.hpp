@@ -4,8 +4,9 @@
 
 #include "camera/Camera.hpp"
 #include "shader/Shader.hpp"
-#include "models/models.hpp"
+#include "mesh/mesh.hpp"
 #include <math.h>
+
 class Scene;
 
 class UI
@@ -24,12 +25,11 @@ public:
 
     void Update(Scene&);
     void MainMenu(Scene&);
-    void NormalsMenu();
-    void EditVertexMenu(Model&);
-    void HistogramMenu();
+    void EditVertexMenu(Mesh&);
+    void JacobianMenu();
     void RatioMenu();
-    void FixMenu(Model& );
-    void PersolizeMenu();
+    void FixMenu(Mesh& );
+    void CustomizeMenu();
 
     void Destroy();
 
@@ -41,7 +41,7 @@ public:
 
     int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
 
-    std::vector<float> histogramData;
+    std::vector<float> JTotal;
     std::vector<float> histogramLabels;
 
     std::vector<float> Jdata, JRdata, JENSdata, EQdata;
@@ -64,7 +64,7 @@ private:
     ImGui::FileBrowser fileDialog;
 
     // Variables para gestionar los menus activos en pantalla.
-    bool editMenu = false, metricsMenu = false, ratioMenu = false, fixMenu = false, customizeMenu = false; 
+    bool showEditMenu = false, showJacobianMenu = false, showRatioMenu = false, showFixMenu = false, showCustomizeMenu = false; 
     
     bool show_normals = false;
     bool show_demo_window = false;

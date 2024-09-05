@@ -81,9 +81,8 @@ add_executable(${CMAKE_PROJECT_NAME}
                             ${source_dir}/camera/Camera.cpp 
                             ${source_dir}/shader/Shader.cpp 
                             ${source_dir}/common.cpp 
-                            ${source_dir}/models/models.cpp 
-                            ${source_dir}/models/polyhedral.cpp
-                            ${source_dir}/mesh/octree.cpp
+                            ${source_dir}/mesh/mesh.cpp 
+                            ${source_dir}/mesh/polyhedral.cpp
                             ${source_dir}/ui/ui.cpp
                             ${source_dir}/events/events.cpp
                             ${source_dir}/scene/scene.cpp

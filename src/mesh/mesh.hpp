@@ -5,19 +5,18 @@
 #include "shader/Shader.hpp"
 
 
-#include "mesh/octree.hpp"
-#include "models/polyhedral.hpp"
+#include "mesh/polyhedral.hpp"
 
 
 
-class Model
+class Mesh
 {
 public:
-	// Loads in a model from a file and stores tha information in 'data', 'JSON', and 'file'
-	Model(const std::string& file_, glm::vec3);
-	Model(const OctreeNode* octree, glm::vec3);
 
-	void Draw(Shader& shader, Camera& camera, bool wireframe, bool);
+	Mesh(const std::string& file_);
+
+
+	void Draw(Shader& shader, Camera& camera, bool, int);
 
 	void Draw_normals();
 
@@ -69,8 +68,8 @@ private:
 	// Variables for easy access
 
     std::string obtenerExtension(const std::string&);
-    void read_obj(const std::string&, glm::vec3);
-    void read_vtk(const std::string&, glm::vec3);
+    void read_obj(const std::string&);
+    void read_vtk(const std::string&);
 	std::vector<unsigned char> data;
 
 	

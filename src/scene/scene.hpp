@@ -4,10 +4,9 @@
 
 #include "camera/Camera.hpp"
 #include "shader/Shader.hpp"
-#include "models/models.hpp"
-#include "mesh/octree.hpp"
+#include "mesh/mesh.hpp"
 #include "ui/ui.hpp"
-#include "mesh/octree.hpp"
+
 
 
 class Scene
@@ -29,13 +28,12 @@ private:
 public:
     Scene(const unsigned int width, const unsigned int height);
     void Update(Shader& ,UI&);
-    void LoadObject(const std::string &, glm::vec3);
+    void LoadObject(const std::string &);
 
 
     Camera* camera;
-    Model* model;
-    Model* model2;
-    bool model_in_scene = false;
+    Mesh* mesh;
+    bool mesh_in_scene = false;
 
     
     glm::vec3 lightDir;

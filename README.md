@@ -1,5 +1,8 @@
 # MemoriaICI
 
+# TODO: Hacer un Struct o Class que permita ingresar metricas facilmente.
+# TODO: Implementar .vtk nativo
+
 Clonar el repositorio y sus dependencias
 
 git clone https://github.com/fcopizarro/MemoriaICI/ --recursive --j8

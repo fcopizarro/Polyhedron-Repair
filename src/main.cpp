@@ -1,5 +1,3 @@
-
-
 #include "common.hpp"
 
 #include "ui/ui.hpp"
@@ -19,7 +17,7 @@ int main(int argc, char* argv[])
     UI ui(width, height);
     Scene scene(width, height);
 
-	Shader shader("../src/shader/default/vertex.glsl", "../src/shader/default/fragment.glsl");
+    Shader shader("../src/shader/default/vertex.glsl", "../src/shader/default/fragment.glsl");
     Event event;
     
     
@@ -42,22 +40,9 @@ int main(int argc, char* argv[])
         
         event.handle(quit, scene, ui);
 
-		shader.Activate();
+	shader.Activate();
         
         scene.Update(shader, ui);
-        
-
-        /*
-        if (ui.createOctree)
-        {
-            OctreeNode* octree = new OctreeNode(BoundingBox (scene.model->boundary.min, scene.model->boundary.max), 0, 5);
-            octree->subdivide(scene.model->get_vertices(), scene.model->get_tris());
-            Model octree_model(octree);
-            //models_loaded.push_back(octree_model);
-            ui.createOctree = false;
-        }
-        */
-
 
         ui.Update(scene);
 

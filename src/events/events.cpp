@@ -78,10 +78,10 @@ void Event::handle(bool &quit, Scene& scene, UI& ui )
             if (e.button.button == SDL_BUTTON_LEFT) {
                 if(const auto& io = ImGui::GetIO(); !io.WantCaptureMouse) {
                 
-                    if (scene.model_in_scene)
+                    if (scene.mesh_in_scene)
                     {
-                        ui.closestIndex = pickVertex(e.button.x, e.button.y, ui.width, ui.height, scene.camera->GetProjection(), scene.camera->GetView(), scene.model->get_vertices());
-                        ui.vertice = scene.model->get_vertices();
+                        ui.closestIndex = pickVertex(e.button.x, e.button.y, ui.width, ui.height, scene.camera->GetProjection(), scene.camera->GetView(), scene.mesh->get_vertices());
+                        ui.vertice = scene.mesh->get_vertices();
                     }
                 }
             }
