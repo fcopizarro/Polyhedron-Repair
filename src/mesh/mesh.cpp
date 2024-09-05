@@ -599,48 +599,37 @@ void Mesh::read_vtk(const std::string& filename)
 void Mesh::Draw(Shader& shader, Camera& camera, bool editmode, int selected_vertex)
 {   
     shader.Activate();
-
-
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 2);
     Draw_normals();
     DrawMeshLines();
 
     glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 0);
 
-	glBindVertexArray(ID_VAO);
+    glBindVertexArray(ID_VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ID_EBO);
     glDrawElements(GL_TRIANGLES, tris.size() * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
+    
     if (editmode)
     {
-      glPointSize(10.0f); // Configurar tamaño del punto
+        glPointSize(10.0f); // Configurar tamaño del punto
+        glBindVertexArray(ID_VAO);
+      
         if (selected_vertex != -1)
         {
-        
+          // Cambiar color del vertice seleccionado
           glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 3);
-          glBindVertexArray(ID_VAO);
-          glDrawArrays(GL_POINTS, selected_vertex, selected_vertex);
+          glDrawArrays(GL_POINTS, selected_vertex, 1);
           
-
-          glBindVertexArray(0);
+          glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 1);
+          glDrawArrays(GL_POINTS, 0, vertices.size());
+        
+        } else {
+          glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 1);
+          glDrawArrays(GL_POINTS, 0, vertices.size());
         }
-        
-        else
-        {
-        glUniform1i(glGetUniformLocation(shader.ID, "isVertex"), 1);
-        glBindVertexArray(ID_VAO);
-        glDrawArrays(GL_POINTS, 0, vertices.size());
-
-        glBindVertexArray(0);
-        }
-        
-        
+        glBindVertexArray(0);   
     }
-
-    
-
-    
 }
 
 void Mesh::silhouette()

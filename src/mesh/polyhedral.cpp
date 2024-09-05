@@ -1,4 +1,12 @@
 #include "polyhedral.hpp"
+// Metricas
+// {
+// vectores y floats de las metricas
+// nombre de la metrica
+//
+//
+
+
 
 Polyhedral::Polyhedral(const std::vector<Vertex*>& a)
 {}

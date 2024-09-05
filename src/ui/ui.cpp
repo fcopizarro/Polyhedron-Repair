@@ -489,6 +489,14 @@ void UI::EditVertexMenu(Mesh& mesh)
 
             // Variable para almacenar la posicion del vertice seleccionado en la interfaz.
             static float vec4a[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
+            float actual_position[3] = {vertice[closestIndex].position.x, vertice[closestIndex].position.y, vertice[closestIndex].position.z};
+            
+            if (actual_position[0] != vec4a[0] || actual_position[1] != vec4a[1] || actual_position[2] != vec4a[2])
+            {
+              vec4a[0] = actual_position[0];
+              vec4a[1] = actual_position[1];
+              vec4a[2] = actual_position[2];
+            }
             
             // Input con las coordenadas del vertice seleccionado, permitiendolas cambiar desde el menu.
             if(ImGui::InputFloat3("Posicion x, y , z", vec4a, "%.3f"))
@@ -520,10 +528,9 @@ void UI::EditVertexMenu(Mesh& mesh)
                 
                 
                 // TODO: Vincular metricas sin necesidad de almacenarlas
-                // TODO: Cambiar color del vertice seleccionado
                 // TODO: Mostrar metricas del vertice seleccionado
                 
-                
+
             }
 
 
