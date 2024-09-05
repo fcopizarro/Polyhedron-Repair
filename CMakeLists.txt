@@ -86,6 +86,7 @@ add_executable(${CMAKE_PROJECT_NAME}
                             ${source_dir}/ui/ui.cpp
                             ${source_dir}/events/events.cpp
                             ${source_dir}/scene/scene.cpp
+                            ${source_dir}/rw/Reader.cpp
                             )
 
 target_link_libraries(${CMAKE_PROJECT_NAME} ${modules})

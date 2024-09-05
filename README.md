@@ -39,7 +39,7 @@ sudo apt install libglew-dev
 sudo apt-get install libglm-dev
 
 # 2. Clonar el repositorio y sus dependencias directas
-git clone --recursive --j8 https://github.com/fcopizarro/Polyhedron-Repair/ 
+git clone --recursive -j8 https://github.com/fcopizarro/Polyhedron-Repair/ 
 
 # 3. Configurar y Compilar
 cd Polyhedron-Repair

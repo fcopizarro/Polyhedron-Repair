@@ -3,11 +3,8 @@
 #include "common.hpp"
 #include "camera/Camera.hpp"
 #include "shader/Shader.hpp"
-
-
 #include "mesh/polyhedral.hpp"
-
-
+#include "rw/Reader.hpp"
 
 class Mesh
 {
@@ -48,9 +45,9 @@ private:
 	void BindShader();
 	void DrawMeshLines();
 
-    GLuint ID_VAO;
+        GLuint ID_VAO;
 	GLuint ID_VBO;
-    GLuint ID_EBO;
+        GLuint ID_EBO;
 
 	void BindMeshLines();
 

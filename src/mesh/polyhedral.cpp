@@ -1298,8 +1298,6 @@ void Polyhedral_Mesh::FormPolys(const std::vector<Vertex>& vertices)
 {
 
 
-    //std::cout << "FormPolys call\nTamano types: " << types.size() << std::endl;
-
     for (int i = 0; i < types.size(); i++)
     {
         std::vector<Vertex*> vertex_refs;

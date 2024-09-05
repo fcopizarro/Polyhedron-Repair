@@ -1,62 +1,43 @@
 #include "mesh.hpp"
 #include "polyhedral.hpp"
 
-/**
- * @brief Verifica si una línea de texto está vacía.
- * 
- * Esta función determina si una línea de texto está vacía o contiene solo caracteres de espacio en blanco, tabulaciones,
- * retornos de carro (CR) y saltos de línea (LF). Es compatible con los diferentes formatos de salto de línea utilizados en Unix
- * y Windows.
- * 
- * Se consideran caracteres en blanco los siguientes:
- * - Espacios (espacio en blanco)
- * - Tabulaciones (tab)
- * - Retornos de carro (CR)
- * - Saltos de línea (LF)
- * 
- * @param line La línea de texto a verificar.
- * 
- * @return `true` si la línea está vacía o solo contiene caracteres en blanco, `false` en caso contrario.
- */
-bool is_line_empty(std::string line)
+
+
+
+Mesh::Mesh(const std::string& filename)
 {
-  if (line.empty() || line.find_first_not_of(" \t\r\n") == std::string::npos)
-    return true;
-  return false;
-}
-
-
-Mesh::Mesh(const std::string& file_)
-{
-    filename = file_;
-    std::cout << filename << std::endl;
-
-    std::string model_ext = obtenerExtension(filename);
-
-    bool mesh_loaded = true;
     
-    if (model_ext == "obj")
+    Reader reader;
+    reader.read_file(filename);
+    
+    
+    if (reader.read_status)
     {
-        read_obj(filename);
-        boundary = BoundingBox(min, max);
-        
-    } else if (model_ext == "vtk")
-    {
-        read_vtk(filename);
-        boundary = BoundingBox(min, max);
-    }
-    else
-    {
-        mesh_loaded = false;
-        std::cout << "Formato no soportado " << model_ext << std::endl;
+      vertices = reader.vertices;
+      
+      if (reader.has_polyhedrons)
+      {
+        for (Vertex &vert: reader.vertices)
+            polyMesh.PushVertex(vert.position);
+        for (auto &indice: reader.indices)
+            polyMesh.PushIndex(indice);
+        std::cout << polyMesh.cou
+        //polyMesh.FormPolys(vertices);
+        //polyMesh.CalculateJ();
+        //polyMesh.GetJ();
+        //tris = polyMesh.toTris();
+      } else
+      {
+        tris = reader.tris;
+      }
+      
+      
+      BindShader();
+      
     }
 
-    if (mesh_loaded)
-        BindShader();
-    
-
-
-
+// TODO: Checkear vertices mayores y menores al final....
+// TODO: Graficar lineas de tris
 
 }
 
@@ -137,19 +118,6 @@ void Mesh::calculateFaceNormals(std::vector<Vertex>& vertices, const std::vector
 
 
 
-std::string Mesh::obtenerExtension(const std::string& nombreArchivo) {
-    // Buscar el último punto en el nombre del archivo
-    size_t puntoPos = nombreArchivo.find_last_of('.');
-    
-    // Si no se encontró ningún punto, no hay extensión
-    if (puntoPos == std::string::npos) {
-        return "";
-    }
-
-    // Obtener la extensión a partir del punto
-    return nombreArchivo.substr(puntoPos + 1);
-}
-
 
 void Mesh::setVertexPosition(int index, float x, float y, float z)
 {
@@ -218,383 +186,6 @@ void updateMinMax(glm::vec3& min, glm::vec3& max, float x, float y, float z)
 
 }
 
-void Mesh::read_obj(const std::string& filename)
-{
-    std::ifstream file(filename);
-        if (!file.is_open()) {
-            std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
-        }
-
-
-        std::string line;
-
-        float min_value = std::numeric_limits<float>::lowest();
-        float max_value = std::numeric_limits<float>::max();
-
-        glm::vec3 min_ (max_value, max_value, max_value);
-        glm::vec3 max_ (min_value, min_value, min_value);
-
-        while (std::getline(file, line)) {
-            std::istringstream iss(line);
-            std::string token;
-            iss >> token;
-
-            if (token == "v") {
-                float x, y, z;
-                iss >> x >> y >> z;
-
-                updateMinMax(min_, max_, x, y, z);
-
-                Vertex ver = { glm::vec3(x, y, z), glm::vec3(0.0f)};
-
-                vertices.push_back(ver);
-
-
-            } else if (token == "f") {
-
-                std::vector <int> indexs;
-
-                int numero;
-                while (!iss.eof()) {
-                    if (iss >> numero) {
-                        indexs.push_back((GLuint) numero);
-                    } else {
-                        break;
-                    }
-                }
-
-                if (indexs.size() == 3)
-                {
-                    int i3 = indexs.back();
-                    indexs.pop_back();
-
-                    int i2 = indexs.back();
-                    indexs.pop_back();
-
-                    int i1 = indexs.back();
-                    indexs.pop_back();
-
-                    Tri tri1 = {i1 - 1, i2 - 1, i3 - 1};
-                    tris.push_back(tri1);
-
-                } else if (indexs.size() == 4)
-                {
-                    int i4 = indexs.back();
-                    indexs.pop_back();
-
-                    int i3 = indexs.back();
-                    indexs.pop_back();
-
-                    int i2 = indexs.back();
-                    indexs.pop_back();
-
-                    int i1 = indexs.back();
-                    indexs.pop_back();
-
-                    /*
-
-                    tris2.push_back(i1 - 1);
-                    tris2.push_back(i2 - 1);
-                    tris2.push_back(i3 - 1);
-
-                    tris2.push_back(i1 - 1);
-                    tris2.push_back(i3 - 1);
-                    tris2.push_back(i4 - 1);
-                    */
-
-                    Tri tri1 = {i1 - 1, i2 - 1, i3 - 1};
-                    Tri tri2 = {i1 - 1, i3 - 1, i4 - 1};
-
-                    tris.push_back(tri1);
-                    tris.push_back(tri2);
-
-
-
-                } else {
-                    std::cout << "Cantidad de caras no soportadas" << std::endl;
-                }
-                
-            }
-        }
-
-        file.close();
-
-        std::cout << "Minimo " << min_.x << " " << min_.y << " " << min_.z << " " << std::endl; 
-        std::cout << "Maximo " << max_.x<< " "  << max_.y << " " << max_.z << " " << std::endl; 
-
-        min = min_;
-        max = max_;
-}
-
-
-
-void Mesh::read_vtk(const std::string& filename)
-{
-
-    float min_value = std::numeric_limits<float>::lowest();
-    float max_value = std::numeric_limits<float>::max();
-
-    glm::vec3 min_ (max_value, max_value, max_value);
-    glm::vec3 max_ (min_value, min_value, min_value);
-
-
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error: No se pudo abrir el archivo " << filename << std::endl;
-    }
-
-
-    std::string line;
-
-    int line_count = 0;
-
-    bool name_getted = false;
-    bool cod_getted = false;
-    bool dataset_getted = false;
-    bool points_getted = false;
-    bool cells_getted = false;
-    bool cellstype_getted = false;
-    std::string structure;
-
-
-
-    bool debug = true;
-    
-    
-    // VTK HEADERS:
-    // - VTK Version
-    // - VTK Name
-    // - File Codification
-    // - Dataset Structure
-    
-    std::string version = "";
-    std::string name = "";
-    std::string cod = "";
-    std::string dataset  = "";
-    
-
-    // leer cabecera.
-    while (std::getline(file, line)) {
-
-        if (is_line_empty(line))
-        {
-            std::cout << "Empty line." << std::endl;
-            continue;
-        }
-        
-        if(version.empty()) 
-        {
-          version = line;
-          std::cout << "+++++++++" << line << std::endl;
-          continue;
-        }
-        
-        if (name.empty())
-        {
-          name = line;
-          std::cout << "+++++++++" << line << std::endl;
-          continue;
-        }
-        
-        if (cod.empty())
-        {
-          cod = line;
-          std::cout << "+++++++++" << line << std::endl;
-          continue;
-        }
-        
-        if (dataset.empty())
-        {
-          dataset = line;
-          std::cout << "+++++++++" << line << std::endl;
-          break;
-        }
-    }
-    
-    
-    // Conseguir Encabezado POINTS NUM_PUNTOS TIPO_DE_DATO
-  
-
-    std::string points, tipo;
-    int points_num;
-    
-    while (!points_getted)
-    {
-        std::getline(file, line); // cantidad de puntos
-        // std::cout << "-----------" << line << std::endl;
-        
-        if (is_line_empty(line))
-            continue;
-            
-        std::istringstream iss(line);
-
-        
-
-        iss >> points >> points_num >> tipo;
-        //std::cout << "Puntos " <<  points_num << std::endl;
-
-        points_getted = true;
-
-        //if (debug)
-        //    std::cout << "DEBUG: " << line << std::endl;
-    }
-    
-    std::vector <glm::vec3> points_vector;
-    std::vector <float> temp;
-
-
-    bool points_extracted  = false;
-
-
-    while (!points_extracted)
-    {
-        std::getline(file, line); // cantidad de puntos
-        std::istringstream iss(line);
-
-        float n;
-        
-        while (iss >> n)
-        {
-            temp.push_back(n);
-        }
-
-        //polyMesh.PushVertex(glm::vec3(x, y, z));
-
-        if ( int(temp.size() / 3) >= points_num)
-        {
-            points_extracted = true;
-            //std::cout << "Alcanzado" << std::endl;
-        }
-    }
-
-    int init = 0;
-    for (int i = 0; i < points_num; i += 1)
-    {
-        vertices.push_back({ glm::vec3(temp[init], temp[init+1], temp[init+2]), glm::vec3(0.0f), glm::vec3(0.5f)});
-        updateMinMax(min_, max_, temp[init], temp[init+1], temp[init+2]);
-        polyMesh.PushVertex(glm::vec3(temp[init], temp[init+1], temp[init+2]));
-        init +=3;
-    }
-    
-    min = min_;
-    max = max_;
-
-
-
-
-
-    std::string cells;
-    int n_cells, n_indexs;
-
-    // Conseguir Encabezado CELLS NUM_CELLS SIZE_INDEXS
-    while (!cells_getted)
-    {
-        std::getline(file, line); // cantidad de puntos
-        std::istringstream iss_cells(line);
-
-        if (is_line_empty(line))
-            continue;
-
-        iss_cells >> cells >> n_cells >> n_indexs;
-
-        cells_getted = true;
-
-        if (debug)
-            std::cout << "DEBUG: " << line << std::endl;
-    }
-
-
-    
-
-    std::vector <std::vector <int>> total_indexs;
-
-
-    for (int i = 0; i < n_cells; i++)
-    {
-        std::getline(file, line); // cantidad de puntos
-        std::istringstream iss_indexs(line);
-
-        int indexs;
-
-        iss_indexs >> indexs;
-
-        std::vector <int> indices;
-
-        for (int j = 0; j < indexs; j++)
-        {
-            int i_;
-            iss_indexs >> i_;
-            indices.push_back(i_);
-        }
-
-        total_indexs.push_back(indices);
-        polyMesh.PushIndex(indices);
-
-        
-    }
-
-    std::cout << "N° indices leidos " << total_indexs.size() << std::endl; 
-
-
-    std::string cells_types;
-    int n_cells_types;
-
-    // Conseguir Encabezado CELLS NUM_CELLS SIZE_INDEXS
-    while (!cellstype_getted)
-    {
-        std::getline(file, line); // cantidad de puntos
-        std::istringstream iss_cells(line);
-
-        if (is_line_empty(line))
-            continue;
-
-        iss_cells >> cells_types >> n_cells_types;
-
-        //std::cout << line << std::endl;
-        cellstype_getted = true;
-    }
-
-    std::cout << "NUMERO DE CELDAS " << n_cells_types << std::endl;
-
-    std::vector <int> cells_types_vector;
-
-    for (int i = 0; i < n_cells; i++)
-    {
-        std::getline(file, line); // cantidad de puntos
-        std::istringstream iss_type(line);
-
-        int tipo;
-
-        iss_type >> tipo;
-
-        cells_types_vector.push_back(tipo);
-        polyMesh.PushType(tipo);
-        
-    }
-
-    std::cout << "N° tipos celdas leidos " << cells_types_vector.size() << std::endl; 
-
-
-
-    // ------------------------ DATOS EXTRAIDOS ------------------------
-
-
-
-    polyMesh.FormPolys(vertices);
-    polyMesh.CalculateJ();
-    polyMesh.GetJ();
-    polyMesh.toString(); 
-
-    //vertices = polyMesh.toVertex();
-    tris = polyMesh.toTris();
-
-    //std::cout << "VER" << vertices.size() << "\n TRI" << tris.size() << std::endl;
-    //std::cout << vertices[0].position.x << " " << vertices[0].position.y << " " << vertices[0].position.z << std::endl;
-    //std::cout << vertices[1].position.x << " " << vertices[1].position.y << " " << vertices[1].position.z << std::endl;
-
-    //std::cout << tris[0].v0 << " " << tris[0].v1 << " " << tris[0].v2 << std::endl;
-
-}
 
 void Mesh::Draw(Shader& shader, Camera& camera, bool editmode, int selected_vertex)
 {   
