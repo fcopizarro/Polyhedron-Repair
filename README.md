@@ -1,5 +1,6 @@
+<div align="center">
 # MemoriaICI
-
+</div>
 # TODO: Hacer un Struct o Class que permita ingresar metricas facilmente.
 # TODO: Implementar .vtk nativo
 
