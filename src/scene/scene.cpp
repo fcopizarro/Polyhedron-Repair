@@ -31,11 +31,6 @@ void Scene::Update(Shader& shader, UI& ui)
     {
         mesh->Draw(shader, *camera, ui.editMode, ui.closestIndex);
 
-        ui.qtyHexa = mesh->polyMesh.qtyHexa;
-        ui.qtyPrism = mesh->polyMesh.qtyPrism;
-        ui.qtyPyra = mesh->polyMesh.qtyPyra;
-        ui.qtyTetra = mesh->polyMesh.qtyTetra;
-
         camera->cameraTarget = mesh->GetCenter();
    
     
@@ -60,17 +55,7 @@ void Scene::Update(Shader& shader, UI& ui)
             mesh->polyMesh.includePrism2 = ui.includePrism2;
             mesh->polyMesh.includePyra2 = ui.includePyra2;
             // calculatej cuando hay cambio de vert
-            mesh->polyMesh.CalculateJ();
-            ui.JTotal = mesh->polyMesh.Jtotal;
-            ui.Jdata = mesh->polyMesh.Jdata;
-            ui.JRdata = mesh->polyMesh.JRdata;
-            ui.JENSdata = mesh->polyMesh.JENSdata;
-            ui.EQdata = mesh->polyMesh.EQdata;
-
-            ui.ARtotal = mesh->polyMesh.ARtotal;
-            ui.ARdata = mesh->polyMesh.ARdata;
-            ui.ARGdata = mesh->polyMesh.ARGdata;
-            ui.ARENdata = mesh->polyMesh.ARENdata;
+            //mesh->polyMesh.CalculateJ();
         }
 
     }
@@ -131,3 +116,23 @@ void Scene::GraphAxis(Shader& shader)
 
 
 }
+
+bool Scene::isMeshLoaded() {return mesh_in_scene;} 
+const char* Scene::getMeshName() const {return mesh->filename.c_str();}
+size_t Scene::getVertexCount() {return mesh->vertices.size();} 
+size_t Scene::getPolyhedronCount() {return mesh->polyMesh.polyhedrons.size();} 
+
+int Scene::getHexaCount() {return mesh->polyMesh.qtyHexa;} 
+int Scene::getTetraCount() {return mesh->polyMesh.qtyTetra;} 
+int Scene::getPrismCount() {return mesh->polyMesh.qtyPrism;} 
+int Scene::getPyraCount() {return mesh->polyMesh.qtyPyra;} 
+
+void Scene::CalculateMetrics() {mesh->polyMesh.CalculateJ();} 
+
+std::vector<float>* Scene::getJacobianTotalPtr() { return &mesh->polyMesh.Jtotal;}
+std::vector<float>* Scene::getJsPtr() {return &(mesh->polyMesh.Jdata);}
+std::vector<float>* Scene::getJensPtr() {return &(mesh->polyMesh.JENSdata);}
+std::vector<float>* Scene::getARTotalPtr() {return &(mesh->polyMesh.ARtotal);}
+std::vector<float>* Scene::getARPtr() {return &(mesh->polyMesh.ARdata);}
+std::vector<float>* Scene::getARGPtr() {return &(mesh->polyMesh.ARGdata);}
+std::vector<float>* Scene::getARenPtr() {return &(mesh->polyMesh.ARENdata);}

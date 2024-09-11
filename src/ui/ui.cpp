@@ -189,15 +189,17 @@ void UI::MainMenu(Scene& scene)
                   scene.mesh_in_scene = false;
 
                   // Limpiar metricas almacenadas
-                  JTotal.clear();
-                  Jdata.clear();
-                  JRdata.clear();
-                  JENSdata.clear();
-                  EQdata.clear();
-                  ARtotal.clear();
-                  ARdata.clear();
-                  ARGdata.clear();
-                  ARENdata.clear();
+
+                  JTotalptr = NULL;
+                  Jsptr = NULL;
+                  Jensptr = NULL;
+    /*
+    std::vector<float>* ARTotalptr;
+    std::vector<float>* ARptr;
+    std::vector<float>* ARGptr;
+    std::vector<float>* ARenptr;
+    */
+
 
                 }
              }
@@ -213,40 +215,50 @@ void UI::MainMenu(Scene& scene)
     {
             // Cargar el objeto en la escena.
             scene.LoadObject(fileDialog.GetSelected().string());
-            std::cout << "Selected filename " << fileDialog.GetSelected().string() << std::endl;
             
             // Limpiar seleccion
             fileDialog.ClearSelected();
 
             // Calcular Metricas de la malla cargada
-            scene.mesh->polyMesh.CalculateJ();
-            //scene.mesh->polyMesh.GetJ();
+            scene.CalculateMetrics();
+            
+            // Conseguir informacion basica del archivo
+            filename = scene.getMeshName();
+            qtyVertex = scene.getVertexCount();
+            
+            // Conseguir cantidad de poliedros para la interfaz
+            qtyPolyhedron = scene.getPolyhedronCount();
+            qtyHexa = scene.getHexaCount();
+            qtyPrism = scene.getPrismCount();
+            qtyPyra = scene.getPyraCount();
+            qtyTetra = scene.getTetraCount();
 
             // Tomar las metricas calculadas y cargarlas en la interfaz usuaria.
-            JTotal = scene.mesh->polyMesh.Jtotal;
-            Jdata = scene.mesh->polyMesh.Jdata;
-            JRdata = scene.mesh->polyMesh.JRdata;
-            JENSdata = scene.mesh->polyMesh.JENSdata;
-            EQdata = scene.mesh->polyMesh.EQdata;
+            JTotalptr = scene.getJacobianTotalPtr();
+            Jsptr = scene.getJsPtr();
+            //JRdata = &(scene.mesh->polyMesh.JRdata);
+            Jensptr = scene.getJensPtr();
+            //EQdata = &(scene.mesh->polyMesh.EQdata);
 
-            ARtotal = scene.mesh->polyMesh.ARtotal;
-            ARdata = scene.mesh->polyMesh.ARdata;
-            ARGdata = scene.mesh->polyMesh.ARGdata;
-            ARENdata = scene.mesh->polyMesh.ARENdata;
+            ARTotalptr = scene.getARTotalPtr();
+            ARptr = scene.getARPtr();
+            ARGptr = scene.getARGPtr();
+            ARenptr = scene.getARenPtr();
+            
+            
     }
 
     // Si se ha cargado la malla correctamente
     // Mostrar en el menu la  informacion resumida de la malla cargada.
-    if(scene.mesh_in_scene)
+    if(scene.isMeshLoaded())
     {
-      ImGui::Text("Malla cargada desde:\n%s", scene.mesh->filename.c_str());
+      ImGui::Text("Malla cargada desde:\n%s", filename);
 
       ImGui::Text("\nInformacion de la Malla");
       
-      // TODO: CREAR METODO PARA EXTRAER INFORMACION
-      ImGui::Text("\nN° de vertices: %zu", scene.mesh->vertices.size());
+      ImGui::Text("\nN° de vertices: %zu", qtyVertex);
 
-      ImGui::Text("\nN° de poliedros: %zu", scene.mesh->polyMesh.polyhedrons.size());
+      ImGui::Text("\nN° de poliedros: %zu", qtyPolyhedron);
       ImGui::Text(" %i Hexaedra", qtyHexa);
       ImGui::Text(" %i Tetrahedra", qtyTetra);
       ImGui::Text(" %i Pyramid", qtyPyra);
@@ -325,7 +337,14 @@ void UI::JacobianMenu()
             ImGui::SetNextItemWidth(200);
             ImGui::DragFloat2("##Range",&rmin,0.01f,-1,1);
         }
-
+        
+        // Verificar que no hayan punteros invalidos a los datos
+        if (JTotalptr == NULL || Jsptr == NULL || Jensptr == NULL
+            || ARTotalptr == NULL || ARptr == NULL || ARGptr == NULL || ARenptr == NULL )
+        {
+            ImGui::End();
+            return ;
+        }
 
         // Inicia un nuevo gráfico en ImPlot para mostrar histogramas de datos relacionados con el Jacobiano.
         if (ImPlot::BeginPlot("##Histograms")) {
@@ -339,14 +358,14 @@ void UI::JacobianMenu()
               ImPlot::SetNextLineStyle(ImVec4(1,0,0,1));
               ImPlot::SetNextFillStyle(ImVec4(1,0,0,1), 0.25);
               // Dar los datos que son transformados al histograma
-              ImPlot::PlotHistogram("Total", JTotal.data(), JTotal.size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
+              ImPlot::PlotHistogram("Total", (*JTotalptr).data(), (*JTotalptr).size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
             }
 
             if(showJ)
             {
             ImPlot::SetNextLineStyle(ImVec4(0,1,0,1));
             ImPlot::SetNextFillStyle(ImVec4(0,1,0,1), 0.25);
-            ImPlot::PlotHistogram("Scaled Jacobian", Jdata.data(), Jdata.size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("Scaled Jacobian", (*Jsptr).data(), (*Jsptr).size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
             }
             
             // TODO: Deshabilitado por necesitar ajustes en el calculo del jacobianao
@@ -359,13 +378,14 @@ void UI::JacobianMenu()
             }
             */
 
+
             if(showJens)
             {
             ImPlot::SetNextLineStyle(ImVec4(1,1,0,1));
             ImPlot::SetNextFillStyle(ImVec4(1,1,0,1), 0.25);
-            ImPlot::PlotHistogram("Jens", JENSdata.data(), JENSdata.size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("Jens", (*Jensptr).data(), (*Jensptr).size(), binsJ, 1.0, range ? ImPlotRange(rmin,rmax) : ImPlotRange(-1.0f, 1.0f));
             }
-            
+
             // Finaliza el gráfico,
             ImPlot::EndPlot();
         }
@@ -422,35 +442,36 @@ void UI::RatioMenu()
 
             if (ImPlot::BeginPlot("##Histograms2")) {
             ImPlot::SetupAxes(nullptr,nullptr,ImPlotAxisFlags_AutoFit,ImPlotAxisFlags_AutoFit);
+            
 
             if(showAllAR)
             {
             ImPlot::SetNextLineStyle(ImVec4(1,0,0,1));
             ImPlot::SetNextFillStyle(ImVec4(1,0,0,1), 0.25);
-            ImPlot::PlotHistogram("Total", ARtotal.data(), ARtotal.size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("Total", (*ARTotalptr).data(), (*ARTotalptr).size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
             }
 
             if(showAR)
             {
             ImPlot::SetNextLineStyle(ImVec4(0,1,0,1));
             ImPlot::SetNextFillStyle(ImVec4(0,1,0,1), 0.25);
-            ImPlot::PlotHistogram("AR", ARdata.data(), ARdata.size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("AR", (*ARptr).data(), (*ARptr).size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
             }
 
             if(showARG)
             {
             ImPlot::SetNextLineStyle(ImVec4(0,0,1,1));
             ImPlot::SetNextFillStyle(ImVec4(0,0,1,1), 0.25);
-            ImPlot::PlotHistogram("ARG", ARGdata.data(), ARGdata.size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("ARG", (*ARGptr).data(), (*ARGptr).size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
             }
 
             if(showARen)
             {
             ImPlot::SetNextLineStyle(ImVec4(1,1,0,1));
             ImPlot::SetNextFillStyle(ImVec4(1,1,0,1), 0.25);
-            ImPlot::PlotHistogram("ARen", ARENdata.data(), ARENdata.size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
+            ImPlot::PlotHistogram("ARen", (*ARenptr).data(), (*ARenptr).size(), binsAR, 1.0, range2 ? ImPlotRange(rmin2,rmax2) : ImPlotRange(-1.0f, 1.0f));
             }
-            
+
             ImPlot::EndPlot();
             }
         }
@@ -517,7 +538,8 @@ void UI::EditVertexMenu(Mesh& mesh)
                 //mesh.polyMesh.GetJ();
                 
                 // Copiar metricas actualizadas de los poliedros
-                JTotal = mesh.polyMesh.Jtotal;
+                /*     ACTUALIZARRRRR
+                JTotal = mesh.polyMesh.Jtotal; 
                 Jdata = mesh.polyMesh.Jdata;
                 //JRdata = mesh.polyMesh.JRdata; // DESHABILITADA
                 JENSdata = mesh.polyMesh.JENSdata;
@@ -526,6 +548,7 @@ void UI::EditVertexMenu(Mesh& mesh)
                 ARdata = mesh.polyMesh.ARdata;
                 ARGdata = mesh.polyMesh.ARGdata;
                 ARENdata = mesh.polyMesh.ARENdata;
+                */
                 
                 
                 // TODO: Vincular metricas sin necesidad de almacenarlas
@@ -618,49 +641,53 @@ void UI::CustomizeMenu()
  */
 void UI::FixMenu(Mesh& mesh) 
 {
-    static float scaleFix = 0.0f;
+
     ImGui::Begin("Menu Fix", &showFixMenu);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 
     ImGui::Text("Seleccione el metodo de reparacion");
-    static int metodo = 0;
-    ImGui::RadioButton("Aleatorio", &metodo, 0); 
-    ImGui::RadioButton("Gradiante", &metodo, 1);
+    static int repair_method = 0;
+    ImGui::RadioButton("Aleatorio", &repair_method, 0); 
+    ImGui::RadioButton("Gradiante", &repair_method, 1);
 
 
     ImGui::Text("\nSeleccione la metrica a reparar");
-    static int e = 0;
-    ImGui::RadioButton("Scaled Jacobian", &e, 0); 
+    static int metric_to_use = 0;
+    ImGui::RadioButton("Scaled Jacobian", &metric_to_use, 0); 
     //ImGui::RadioButton("Jacobian Ratio", &e, 1);
-    ImGui::RadioButton("Jens", &e, 2);
+    ImGui::RadioButton("Jens", &metric_to_use, 2);
 
+    static float threshold = 0.0f;
     ImGui::Text("\nSeleccione la calidad minima");
-    ImGui::SliderFloat("##", &scaleFix, -1.0f, 1.0f);
+    ImGui::SliderFloat("##", &threshold, -1.0f, 1.0f);
 
     ImGui::Text("\nIntentos");
-    static int intentos = 1000;
-    ImGui::InputInt("##2", &intentos, -1, 1);
+    static int tries = 1000;
+    ImGui::InputInt("##2", &tries, -1, 1);
 
     ImGui::Text("\n");
     if (ImGui::Button("Reparar Malla"))
     {
-        mesh.polyMesh.FixJ(scaleFix, intentos, metodo, e);    
+        mesh.polyMesh.FixJ(threshold, tries, repair_method, metric_to_use);    
         mesh.UpdateModelGraph();
         mesh.updateNormals();
         mesh.UpdateMeshLines();
 
         mesh.polyMesh.CalculateJ();
+        
+        /*
         JTotal.clear();
 
-        JTotal = mesh.polyMesh.Jtotal;
-        Jdata = mesh.polyMesh.Jdata;
-        JRdata = mesh.polyMesh.JRdata;
-        JENSdata = mesh.polyMesh.JENSdata;
-        EQdata = mesh.polyMesh.EQdata;
+        JTotal = &mesh.polyMesh.Jtotal;
+        Jdata = &mesh.polyMesh.Jdata;
+        JRdata = &mesh.polyMesh.JRdata;
+        JENSdata = &mesh.polyMesh.JENSdata;
+        EQdata = &mesh.polyMesh.EQdata;
 
-        ARtotal = mesh.polyMesh.ARtotal;
-        ARdata = mesh.polyMesh.ARdata;
-        ARGdata = mesh.polyMesh.ARGdata;
-        ARENdata = mesh.polyMesh.ARENdata;
+        ARtotal = &mesh.polyMesh.ARtotal;
+        ARdata = &mesh.polyMesh.ARdata;
+        ARGdata = &mesh.polyMesh.ARGdata;
+        ARENdata = &mesh.polyMesh.ARENdata;
+        */	
     }    
 
     static int generados = 0;

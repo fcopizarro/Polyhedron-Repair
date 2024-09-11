@@ -156,42 +156,41 @@ public:
 
 // Mesh compuesto por uno o mas polihedros
 class Polyhedral_Mesh
-{
-private:
-    std::vector <glm::vec3> vertexs;
-    
-    
-    
-public:
-    std::vector <int> types;
-    std::vector <std::vector <int>> indexs; 
-    std::vector <std::shared_ptr<Polyhedron>> polyhedrons;
-    Polyhedral_Mesh(/* args */);
-    void BindPolyhedronsInfo(std::vector <std::vector<int>>, std::vector <int> );
-    
-    void CreatePolyhedrons(const std::vector<Vertex>&);
-    void toString();
+    {
+    private:
+        std::vector <glm::vec3> vertexs;
+        
+        
+        
+    public:
+        std::vector <int> types;
+        std::vector <std::vector <int>> indexs; 
+        std::vector <std::shared_ptr<Polyhedron>> polyhedrons;
+        Polyhedral_Mesh();
+        void BindPolyhedronsInfo(std::vector <std::vector<int>>, std::vector <int> );
+        
+        void CreatePolyhedrons(const std::vector<Vertex>&);
+        void toString();
 
-    void CalculateJ();
-    //void GetJ();
+        void CalculateJ();
 
-    std::vector<Vertex> toVertex();
-    std::vector<Tri> toTris();
+        std::vector<Vertex> toVertex();
+        std::vector<Tri> toTris();
 
-    bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;
-    bool includeHexa2 = true, includeTetra2 = true, includePyra2 = true, includePrism2 = true;
+        bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;
+        bool includeHexa2 = true, includeTetra2 = true, includePyra2 = true, includePrism2 = true;
 
-    std::vector<float> Jtotal, Jdata, JRdata, JENSdata, EQdata;
-    std::vector<float> ARtotal, ARdata, ARGdata, ARENdata;
+        std::vector<float> Jtotal, Jdata, JRdata, JENSdata, EQdata;
+        std::vector<float> ARtotal, ARdata, ARGdata, ARENdata;
 
-    std::vector<float> histogramData;
-    std::vector<float> histogramLabels;
+        std::vector<float> histogramData;
+        std::vector<float> histogramLabels;
 
-    std::vector<float> JData;
+        std::vector<float> JData;
 
-    int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
+        int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
 
-    void FixJ(float , int, int, int);
-    
-};
+        void FixJ(float , int, int, int);
+        
+    };
 

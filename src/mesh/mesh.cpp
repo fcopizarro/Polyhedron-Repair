@@ -10,6 +10,7 @@ Mesh::Mesh(const std::string& filename)
     // Instanciar lector y darle el archivo deseado.
     Reader reader;
     reader.read_file(filename);
+    this->filename = filename;
     
     if (reader.read_status)
     {
@@ -57,6 +58,7 @@ Mesh::Mesh(const std::string& filename)
 glm::vec3 Mesh::GetCenter()
 {
     return glm::vec3( (boundary.min.x + boundary.max.x) / 2.0f, (boundary.min.y + boundary.max.y) / 2.0f, (boundary.min.z + boundary.max.z) / 2.0f  );
+    // TODO: ACTUALIZAR BOUNDARY.
 }
 
 

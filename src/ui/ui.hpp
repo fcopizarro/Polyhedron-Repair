@@ -38,14 +38,20 @@ public:
     bool createOctree = false;
     bool editMode = false;
 
-
+    const char* filename;
+    size_t qtyVertex = 0, qtyPolyhedron = 0;
     int qtyHexa = 0, qtyTetra = 0, qtyPyra = 0, qtyPrism = 0;
 
-    std::vector<float> JTotal;
-    std::vector<float> histogramLabels;
-
-    std::vector<float> Jdata, JRdata, JENSdata, EQdata;
-    std::vector<float> ARtotal, ARdata, ARGdata, ARENdata;
+    std::vector<float>* JTotalptr;
+    std::vector<float>* Jsptr;
+    //std::vector<float>* Jrdata;
+    std::vector<float>* Jensptr;
+    //std::vector<float>* EQdata;
+    
+    std::vector<float>* ARTotalptr;
+    std::vector<float>* ARptr;
+    std::vector<float>* ARGptr;
+    std::vector<float>* ARenptr;
     
 
 
