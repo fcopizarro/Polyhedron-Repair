@@ -20,21 +20,12 @@ Scene::Scene(const unsigned int width, const unsigned int height)
 void Scene::Update(Shader& shader, UI& ui)
 {
     shader.Activate();
-    
-
-    glUniform3f(glGetUniformLocation(shader.ID, "lightDir"), lightDir.x, lightDir.y, lightDir.z);
-    glUniform3f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
-    glUniform3f(glGetUniformLocation(shader.ID, "objectColor"), objectColor.x, objectColor.y, objectColor.z);
-
-    
-        
 
 
+    // TODO: Cambiar metodos a la camara
+    // camera -> Update();
     camera->Matrix(45.0f, 0.001f, 100.0f, shader, "camMatrix");
-
     glUniform3f(glGetUniformLocation(shader.ID, "viewPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
-
-    //GraphAxis( shader);
     
     if (mesh_in_scene)
     {
@@ -45,7 +36,7 @@ void Scene::Update(Shader& shader, UI& ui)
         ui.qtyPyra = mesh->polyMesh.qtyPyra;
         ui.qtyTetra = mesh->polyMesh.qtyTetra;
 
-        camera->cameraTarget = glm::vec3( (mesh->boundary.min.x + mesh->boundary.max.x) / 2.0f, (mesh->boundary.min.y + mesh->boundary.max.y) / 2.0f, (mesh->boundary.min.z + mesh->boundary.max.z) / 2.0f  );
+        camera->cameraTarget = mesh->GetCenter();
    
     
         
@@ -69,7 +60,7 @@ void Scene::Update(Shader& shader, UI& ui)
             mesh->polyMesh.includePrism2 = ui.includePrism2;
             mesh->polyMesh.includePyra2 = ui.includePyra2;
             // calculatej cuando hay cambio de vert
-            mesh->polyMesh.GetJ();
+            mesh->polyMesh.CalculateJ();
             ui.JTotal = mesh->polyMesh.Jtotal;
             ui.Jdata = mesh->polyMesh.Jdata;
             ui.JRdata = mesh->polyMesh.JRdata;

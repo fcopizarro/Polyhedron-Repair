@@ -220,7 +220,7 @@ void UI::MainMenu(Scene& scene)
 
             // Calcular Metricas de la malla cargada
             scene.mesh->polyMesh.CalculateJ();
-            scene.mesh->polyMesh.GetJ();
+            //scene.mesh->polyMesh.GetJ();
 
             // Tomar las metricas calculadas y cargarlas en la interfaz usuaria.
             JTotal = scene.mesh->polyMesh.Jtotal;
@@ -242,10 +242,11 @@ void UI::MainMenu(Scene& scene)
       ImGui::Text("Malla cargada desde:\n%s", scene.mesh->filename.c_str());
 
       ImGui::Text("\nInformacion de la Malla");
-
+      
+      // TODO: CREAR METODO PARA EXTRAER INFORMACION
       ImGui::Text("\nN° de vertices: %zu", scene.mesh->vertices.size());
 
-      ImGui::Text("\nN° de poliedros: %zu", scene.mesh->polyMesh.polys.size());
+      ImGui::Text("\nN° de poliedros: %zu", scene.mesh->polyMesh.polyhedrons.size());
       ImGui::Text(" %i Hexaedra", qtyHexa);
       ImGui::Text(" %i Tetrahedra", qtyTetra);
       ImGui::Text(" %i Pyramid", qtyPyra);
@@ -513,7 +514,7 @@ void UI::EditVertexMenu(Mesh& mesh)
                 
                 // Actualizar Metricas de los poliedros
                 mesh.polyMesh.CalculateJ();
-                mesh.polyMesh.GetJ();
+                //mesh.polyMesh.GetJ();
                 
                 // Copiar metricas actualizadas de los poliedros
                 JTotal = mesh.polyMesh.Jtotal;
@@ -617,8 +618,6 @@ void UI::CustomizeMenu()
  */
 void UI::FixMenu(Mesh& mesh) 
 {
-    if (showFixMenu)
-    {
     static float scaleFix = 0.0f;
     ImGui::Begin("Menu Fix", &showFixMenu);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
 
@@ -631,7 +630,7 @@ void UI::FixMenu(Mesh& mesh)
     ImGui::Text("\nSeleccione la metrica a reparar");
     static int e = 0;
     ImGui::RadioButton("Scaled Jacobian", &e, 0); 
-    ImGui::RadioButton("Jacobian Ratio", &e, 1);
+    //ImGui::RadioButton("Jacobian Ratio", &e, 1);
     ImGui::RadioButton("Jens", &e, 2);
 
     ImGui::Text("\nSeleccione la calidad minima");
@@ -650,7 +649,6 @@ void UI::FixMenu(Mesh& mesh)
         mesh.UpdateMeshLines();
 
         mesh.polyMesh.CalculateJ();
-        mesh.polyMesh.GetJ();
         JTotal.clear();
 
         JTotal = mesh.polyMesh.Jtotal;
@@ -674,21 +672,21 @@ void UI::FixMenu(Mesh& mesh)
         std::ofstream outfile (filename);
 
         outfile << "Resumen Js" << std::endl;
-        for (auto poly: mesh.polyMesh.polys)
+        for (auto poly: mesh.polyMesh.polyhedrons)
         {
             for (float J_: poly->J)
                 outfile << std::to_string(J_) << std::endl;
         }
 
         outfile << std::endl << std::endl << "Resumen JR" << std::endl;
-        for (auto poly: mesh.polyMesh.polys)
+        for (auto poly: mesh.polyMesh.polyhedrons)
         {
             for (float J_: poly->JR)
                 outfile << std::to_string(J_) << std::endl;
         }
 
         outfile << std::endl << std::endl << "Resumen Jens" << std::endl;
-        for (auto poly: mesh.polyMesh.polys)
+        for (auto poly: mesh.polyMesh.polyhedrons)
         {
             for (float J_: poly->Jens)
                 outfile << std::to_string(J_) << std::endl;
@@ -700,7 +698,6 @@ void UI::FixMenu(Mesh& mesh)
         generados ++;
     }    
     ImGui::End();
-    }
 
 }
 

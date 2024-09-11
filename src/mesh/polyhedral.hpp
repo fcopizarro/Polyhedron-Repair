@@ -5,7 +5,7 @@
 
 
 
-class Polyhedral
+class Polyhedron
 {
 protected:
     std::vector <float> lengths;
@@ -32,7 +32,7 @@ public:
     virtual float CalculateJens_index(int ) = 0;
     virtual float SimulateMoveJens(int , const glm::vec3&) = 0;
 
-    Polyhedral(const std::vector<Vertex*>&);
+    Polyhedron(const std::vector<Vertex*>&);
     void GiveColor(glm::vec3, glm::vec3);
     bool FixJ(float , int );
     glm::vec3 GenerateRandomMove();
@@ -42,12 +42,12 @@ public:
 
 };
 
-class Hexaedral: public virtual Polyhedral
+class Hexaedron: public virtual Polyhedron
 {
 private:
     float k = 1.0f;
 public:
-    Hexaedral(const std::vector<Vertex*>&);
+    Hexaedron(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
@@ -68,12 +68,12 @@ public:
     
 };
 
-class Tetrahedra: public virtual Polyhedral
+class Tetrahedron: public virtual Polyhedron
 {
 private:
     float kens = sqrt(2) / 2;
 public:
-    Tetrahedra(const std::vector<Vertex*>&);
+    Tetrahedron(const std::vector<Vertex*>&);
     void CalculateJ() override;
     void CalculateJR() override;
     void CalculateAR() override;
@@ -95,7 +95,7 @@ public:
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
-class Pyramid: public virtual Polyhedral
+class Pyramid: public virtual Polyhedron
 {
 private:
     float kens_base = sqrt(6) / 3;
@@ -125,7 +125,7 @@ public:
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
-class Prism: public virtual Polyhedral
+class Prism: public virtual Polyhedron
 {
 private:
     float kens= sqrt(3) / 3;
@@ -159,19 +159,21 @@ class Polyhedral_Mesh
 {
 private:
     std::vector <glm::vec3> vertexs;
-    std::vector <int> types;
-    std::vector <std::vector <int>> indexs; 
+    
+    
     
 public:
-    std::vector <std::shared_ptr<Polyhedral>> polys;
+    std::vector <int> types;
+    std::vector <std::vector <int>> indexs; 
+    std::vector <std::shared_ptr<Polyhedron>> polyhedrons;
     Polyhedral_Mesh(/* args */);
-    void PushVertex(glm::vec3);
-    void PushType(int);
-    void PushIndex(std::vector<int>);
+    void BindPolyhedronsInfo(std::vector <std::vector<int>>, std::vector <int> );
+    
+    void CreatePolyhedrons(const std::vector<Vertex>&);
     void toString();
-    void FormPolys(const std::vector<Vertex>&);
+
     void CalculateJ();
-    void GetJ();
+    //void GetJ();
 
     std::vector<Vertex> toVertex();
     std::vector<Tri> toTris();

@@ -35,6 +35,8 @@ public:
 	std::vector <Vertex> vertices;
 
 	std::vector<glm::vec3> lineVertices;
+	
+	glm::vec3 GetCenter();
 
 
 private:

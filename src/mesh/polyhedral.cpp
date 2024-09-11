@@ -8,16 +8,27 @@
 
 
 
-Polyhedral::Polyhedral(const std::vector<Vertex*>& a)
+Polyhedron::Polyhedron(const std::vector<Vertex*>& a)
 {}
 
 
-Hexaedral::Hexaedral(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
+Hexaedron::Hexaedron(const std::vector<Vertex*>& vasad) : Polyhedron(vasad)
 {
     vertexs_refs = vasad;
 }
 
-std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
+
+/**
+ * @brief Obtiene los índices de los vértices adyacentes a un vértice específico en un hexaedro.
+ * 
+ * Dado un índice de vértice dentro de un hexaedro, esta función devuelve una tupla con los índices de los tres vértices adyacentes.
+ * 
+ * @param index El índice del vértice para el cual se desean obtener los vértices adyacentes. Debe estar en el rango [0, 7] para un hexaedro.
+ * 
+ * @return Una `std::tuple<int, int, int>` que contiene los índices de los tres vértices adyacentes al vértice dado.
+ *         Si el índice proporcionado no está en el rango válido, la función devuelve `{0, 0, 0}` como valor predeterminado.
+ */
+std::tuple<int, int, int> Hexaedron::GetAdjs(int index)
 {
     switch (index)
     {
@@ -40,13 +51,22 @@ std::tuple<int, int, int> Hexaedral::GetAdjs (int index)
       default:
           return {0, 0, 0};
     }
-
 }
-std::tuple<int, int, int> Tetrahedra::GetAdjs (int index)
+
+
+
+/**
+ * @brief Obtiene los índices de los vértices adyacentes a un vértice específico en un tetraedro.
+ * 
+ * Dado un índice de vértice dentro de un tetraedro, esta función devuelve una tupla con los índices de los tres vértices adyacentes.
+ * 
+ * @param index El índice del vértice para el cual se desean obtener los vértices adyacentes. Debe estar en el rango [0, 3] para un tetraedro.
+ * 
+ * @return Una `std::tuple<int, int, int>` que contiene los índices de los tres vértices adyacentes al vértice dado.
+ *         Si el índice proporcionado no está en el rango válido, la función devuelve `{0, 0, 0}` como valor predeterminado.
+ */
+std::tuple<int, int, int> Tetrahedron::GetAdjs (int index)
 {
-
-
-
     switch (index)
     {
     case 0:
@@ -62,6 +82,18 @@ std::tuple<int, int, int> Tetrahedra::GetAdjs (int index)
     }
 
 }
+
+
+/**
+ * @brief Obtiene los índices de los vértices adyacentes a un vértice específico en un prisma.
+ * 
+ * Dado un índice de vértice dentro de un prisma, esta función devuelve una tupla con los índices de los tres vértices adyacentes.
+ * 
+ * @param index El índice del vértice para el cual se desean obtener los vértices adyacentes. Debe estar en el rango [0, 5] para un prisma.
+ * 
+ * @return Una `std::tuple<int, int, int>` que contiene los índices de los tres vértices adyacentes al vértice dado.
+ *         Si el índice proporcionado no está en el rango válido, la función devuelve `{0, 0, 0}` como valor predeterminado.
+ */
 std::tuple<int, int, int> Prism::GetAdjs (int index)
 {
     switch(index)
@@ -81,14 +113,20 @@ std::tuple<int, int, int> Prism::GetAdjs (int index)
         default:
             return {0, 0, 0};
     }
-
 }
+
+
+/**
+ * @brief Obtiene los índices de los vértices adyacentes a un vértice específico en una piramide.
+ * 
+ * Dado que la forma de calcular las metricas de una piramide depende del metodo usado es que la funcion esta sin uso.
+ */
 std::tuple<int, int, int> Pyramid::GetAdjs (int index)
 {
     return {0,0,0};
 }
 
-void Hexaedral::CalculateJ() 
+void Hexaedron::CalculateJ() 
 {
     J.clear();
 
@@ -105,7 +143,7 @@ void Hexaedral::CalculateJ()
 
 
 }
-void Hexaedral::CalculateJR() 
+void Hexaedron::CalculateJR() 
 {
     JR.clear();
     float JsMax = *max_element(J.begin(), J.end());
@@ -116,7 +154,7 @@ void Hexaedral::CalculateJR()
     }
 
 }
-void Hexaedral::CalculateAR()
+void Hexaedron::CalculateAR()
 {
     float min_dist = std::numeric_limits<float>::max();
     float max_dist = std::numeric_limits<float>::lowest();
@@ -196,12 +234,12 @@ void Hexaedral::CalculateAR()
     AR = min_dist / max_dist;
 
 } 
-void Hexaedral::CalculateJENS()
+void Hexaedron::CalculateJENS()
 {
     Jens.clear();
     Jens = J;
 }
-void Hexaedral::CalculateEQ()
+void Hexaedron::CalculateEQ()
 {
     float min = 1.0f;
     float max_negative = -1.0f;
@@ -228,16 +266,16 @@ void Hexaedral::CalculateEQ()
         EQ = min;
 
 }
-void Hexaedral::CalculateAREN()
+void Hexaedron::CalculateAREN()
 {
     ARen = AR;
 }
 
-Tetrahedra::Tetrahedra(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
+Tetrahedron::Tetrahedron(const std::vector<Vertex*>& vasad) : Polyhedron(vasad)
 {
     vertexs_refs = vasad;
 }
-void Tetrahedra::CalculateJ() 
+void Tetrahedron::CalculateJ() 
 {
 
     J.clear();
@@ -254,7 +292,7 @@ void Tetrahedra::CalculateJ()
     }
 
 }
-void Tetrahedra::CalculateJR() 
+void Tetrahedron::CalculateJR() 
 {
     //std::cout << "Calculando JR" << std::endl;
 
@@ -266,7 +304,7 @@ void Tetrahedra::CalculateJR()
     }
 
 }
-void Tetrahedra::CalculateAR()
+void Tetrahedron::CalculateAR()
 {
     lengths.push_back(glm::distance((*vertexs_refs[0]).position, (*vertexs_refs[1]).position));
     lengths.push_back(glm::distance((*vertexs_refs[0]).position, (*vertexs_refs[2]).position));
@@ -289,7 +327,7 @@ void Tetrahedra::CalculateAR()
 
     AR = min_dist / max_dist;
 }
-void Tetrahedra::CalculateARG()
+void Tetrahedron::CalculateARG()
 {
     float R = 0.0f;
 
@@ -313,7 +351,7 @@ void Tetrahedra::CalculateARG()
     
     ARG = (pow(R, 3) * sqrt(2)) / (12 * V);
 } 
-void Tetrahedra::CalculateJENS()
+void Tetrahedron::CalculateJENS()
 {
 
     for (float J_: J)
@@ -332,7 +370,7 @@ void Tetrahedra::CalculateJENS()
         }
     }
 }
-void Tetrahedra::CalculateEQ()
+void Tetrahedron::CalculateEQ()
 {
     float min = 1.0f;
     float max_negative = -1.0f;
@@ -359,12 +397,12 @@ void Tetrahedra::CalculateEQ()
         EQ = min;
 
 }
-void Tetrahedra::CalculateAREN()
+void Tetrahedron::CalculateAREN()
 {
     ARen = AR;
 }   
 
-Pyramid::Pyramid(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
+Pyramid::Pyramid(const std::vector<Vertex*>& vasad) : Polyhedron(vasad)
 {
     vertexs_refs = vasad;
 }
@@ -440,7 +478,7 @@ void Pyramid::CalculateJ()
 
 void Polyhedral_Mesh::FixJ(float min_metric, int maxtrys, int method, int selected_metric)
 {
-    for (auto poly: polys)
+    for (auto poly: polyhedrons)
     {
         // EasyFix -> metodo Random
         if (method == 0)
@@ -451,7 +489,7 @@ void Polyhedral_Mesh::FixJ(float min_metric, int maxtrys, int method, int select
     }
 }
 
-glm::vec3 Polyhedral::GenerateRandomMove()
+glm::vec3 Polyhedron::GenerateRandomMove()
 {
     std::random_device rd;  // Utilizado para obtener una semilla para el generador de números aleatorios
     std::mt19937 gen(rd()); // Generador de números aleatorios Mersenne Twister
@@ -464,14 +502,14 @@ glm::vec3 Polyhedral::GenerateRandomMove()
     return glm::normalize(glm::vec3(x, y, z));
 }
 
-float Polyhedral::SimulateJ(glm::vec3 new_vertex)
+float Polyhedron::SimulateJ(glm::vec3 new_vertex)
 {
     return 0.0f;
 }
 
 
 
-bool Polyhedral::EasyFix(float t, int maxtrys, int selected_metric) // t: umbral
+bool Polyhedron::EasyFix(float t, int maxtrys, int selected_metric) // t: umbral
 {
     std::vector<float>* ptrMetrica;
 
@@ -604,7 +642,7 @@ bool Polyhedral::EasyFix(float t, int maxtrys, int selected_metric) // t: umbral
 
 
 
-bool Polyhedral::GradFix(float t, int maxtrys, int selected_metric) // t: umbral
+bool Polyhedron::GradFix(float t, int maxtrys, int selected_metric) // t: umbral
 {
     std::vector<float>* ptrMetrica;
 
@@ -770,7 +808,7 @@ bool Polyhedral::GradFix(float t, int maxtrys, int selected_metric) // t: umbral
 }
 
 
-bool Polyhedral::FixJ(float minJ, int maxtrys)
+bool Polyhedron::FixJ(float minJ, int maxtrys)
 {
     int actual_try = 0;
     while (actual_try < maxtrys)
@@ -782,7 +820,7 @@ bool Polyhedral::FixJ(float minJ, int maxtrys)
             if (J[i] < minJ) // TODO:  || J[i] < 0) // Fix si o si
             {
                 
-                if (dynamic_cast<Hexaedral*>(this))
+                if (dynamic_cast<Hexaedron*>(this))
                 {
                     int index_1, index_2, index_3;
 
@@ -943,19 +981,19 @@ void Pyramid::CalculateJENS()
             normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
             pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
 
-            origin = (*vertexs_refs[4]).position;;
+            origin = (*vertexs_refs[4]).position;
             normalizedv1 = glm::normalize( (*vertexs_refs[0]).position - origin );
             normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
             normalizedv3 = glm::normalize( (*vertexs_refs[1]).position - origin );
             pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
 
-            origin = (*vertexs_refs[4]).position;;
+            origin = (*vertexs_refs[4]).position;
             normalizedv1 = glm::normalize( (*vertexs_refs[1]).position - origin );
             normalizedv2 = glm::normalize( (*vertexs_refs[3]).position - origin );
             normalizedv3 = glm::normalize( (*vertexs_refs[2]).position - origin );
             pos.push_back(CalculateValueJens(glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3)), kens_));
 
-            origin = (*vertexs_refs[4]).position;;
+            origin = (*vertexs_refs[4]).position;
             normalizedv1 = glm::normalize( (*vertexs_refs[3]).position - origin );
             normalizedv2 = glm::normalize( (*vertexs_refs[2]).position - origin );
             normalizedv3 = glm::normalize( (*vertexs_refs[0]).position - origin );
@@ -1021,7 +1059,7 @@ void Pyramid::CalculateAREN()
 }
 
 
-Prism::Prism(const std::vector<Vertex*>& vasad) : Polyhedral(vasad)
+Prism::Prism(const std::vector<Vertex*>& vasad) : Polyhedron(vasad)
 {
     vertexs_refs = vasad;
 }
@@ -1151,7 +1189,7 @@ Polyhedral_Mesh::Polyhedral_Mesh()
 
 void Polyhedral_Mesh::CalculateJ()
 {
-    for (auto poly: polys)
+    for (auto poly: polyhedrons)
     {
         poly->J.clear();
         poly->JR.clear();
@@ -1160,17 +1198,16 @@ void Polyhedral_Mesh::CalculateJ()
         poly->CalculateJ();
         poly->CalculateJR();
         poly->CalculateAR();
-        if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
             poly->CalculateARG();
 
         poly->CalculateJENS();
         poly->CalculateEQ();
         poly->CalculateAREN();
     }
-}
-
-void Polyhedral_Mesh::GetJ()
-{
+    
+    // Actualizar Informacion de los graficos
+    
     Jtotal.clear();
     Jdata.clear();
     JRdata.clear();
@@ -1185,9 +1222,9 @@ void Polyhedral_Mesh::GetJ()
 
 
 
-    for (auto poly: polys)
+    for (auto poly: polyhedrons)
     {
-        if (std::dynamic_pointer_cast<Hexaedral>(poly) != nullptr)
+        if (std::dynamic_pointer_cast<Hexaedron>(poly) != nullptr)
         {
             if (includeHexa )
             {
@@ -1208,7 +1245,7 @@ void Polyhedral_Mesh::GetJ()
             }
             
 
-        } else if (  std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        } else if (  std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
         {
             if (includeTetra )
             {
@@ -1272,7 +1309,6 @@ void Polyhedral_Mesh::GetJ()
         
     }
 
-
     for(float J_: Jdata)
         Jtotal.push_back(J_);
     for(float J_: JRdata)
@@ -1290,61 +1326,88 @@ void Polyhedral_Mesh::GetJ()
     for(float AR_: ARENdata)
         ARtotal.push_back(AR_);
 
-
 }
 
 
-void Polyhedral_Mesh::FormPolys(const std::vector<Vertex>& vertices)
+
+
+/**
+ * @brief Vincula la información sobre los poliedros a la instancia actual de la clase `Polyhedral_Mesh`.
+ * 
+ * @param indexs Un `std::vector` de `std::vector<int>`, donde cada `std::vector<int>` contiene los índices de los vértices para un poliedro.
+ * @param types Un `std::vector<int>` que contiene el tipo de cada poliedro (por ejemplo, 10 para tetraedros, 12 para hexaedros, etc.).
+ */
+void Polyhedral_Mesh::BindPolyhedronsInfo(std::vector <std::vector<int>> indexs, std::vector <int> types)
+{
+    this->indexs = indexs;
+    this->types = types;
+}
+
+
+/**
+ * @brief Crea poliedros a partir de la información almacenada en los vectores `indexs` y `types`.
+ * 
+ * Este método utiliza un vector de vértices para construir los poliedros especificados por los vectores `indexs` y `types`.
+ * 
+ * @param vertices Un `std::vector` de objetos `Vertex` que representa los vértices disponibles para construir los poliedros.
+ * 
+ * El método realiza las siguientes operaciones:
+ * - Itera sobre la información de cada poliedro usando los vectores `indexs` y `types`.
+ * - Crea una lista de punteros a los vértices correspondientes para cada poliedro.
+ * - Crea una instancia del poliedro correspondiente según el tipo especificado en `types`:
+ *   - Tetraedro (tipo 10)
+ *   - Hexaedro (tipo 12)
+ *   - Prisma (tipo 13)
+ *   - Pirámide (tipo 14)
+ * - Agrega cada poliedro creado a la lista de poliedros (`polyhedrons`).
+ * - Mantiene contadores para el número de cada tipo de poliedro creado (`qtyTetra`, `qtyHexa`, `qtyPrism`, `qtyPyra`).
+ * 
+ * Nota: Esta función está diseñada para manejar formatos específicos de poliedros. Para añadir más tipos de poliedros en el futuro, se deberá modificar esta función.
+ */
+void Polyhedral_Mesh::CreatePolyhedrons(const std::vector<Vertex>& vertices)
 {
 
-
-    for (int i = 0; i < types.size(); i++)
+    // Iterar sobre la informacion del poliedro i.
+    for (int i = 0; i < indexs.size(); i++)
     {
+        // Variable temporal para almacenar la direccion de los vertices que seran vinculados.
         std::vector<Vertex*> vertex_refs;
 
+        // Extraer vertices asociados al poliedro actual (i)
+        // Se extrae la direccion del vertice que indican el indice j asociados al poliedro i
         for (int j = 0; j < indexs[i].size(); j++)
-        {
             vertex_refs.push_back(const_cast<Vertex *>(&vertices[indexs[i][j]]));
-        }
-
-        if (types[i] == 12)
+        
+        // Crear objeto segun el tipo de poliedro que indique,
+        // Dando la referencia de los vertices que le corresponde.
+        if (types[i] == 10)
         {
-            polys.push_back( std::make_shared<Hexaedral>(vertex_refs) );
-            qtyHexa ++;
-        }
-        else if (types[i] == 10)
-        {
-            polys.push_back( std::make_shared<Tetrahedra>(vertex_refs) );
+            // Crear un Tetraedro
+            polyhedrons.push_back( std::make_shared<Tetrahedron>(vertex_refs) );
             qtyTetra ++;
         }
-        else if (types[i] == 14)
-        {
-            polys.push_back( std::make_shared<Pyramid>(vertex_refs) );
-            qtyPyra ++;
+        else if (types[i] == 12)
+        { 
+            // Crear un Hexaedro
+            polyhedrons.push_back( std::make_shared<Hexaedron>(vertex_refs) );
+            qtyHexa ++;
         }
         else if (types[i] == 13)
         {
-            polys.push_back( std::make_shared<Prism>(vertex_refs) );
+            // Crear un Prisma
+            polyhedrons.push_back( std::make_shared<Prism>(vertex_refs) );
             qtyPrism ++;
         }
+        else if (types[i] == 14)
+        {
+            // Crear una Piramide
+            polyhedrons.push_back( std::make_shared<Pyramid>(vertex_refs) );
+            qtyPyra ++;
+        }     
     }
-    
 }
 
 
-void Polyhedral_Mesh::PushVertex(glm::vec3 vertex)
-{
-    vertexs.push_back(vertex);
-}
-
-void Polyhedral_Mesh::PushType(int type_)
-{
-    types.push_back(type_);
-}
-void Polyhedral_Mesh::PushIndex(std::vector<int> index)
-{
-    indexs.push_back(index);
-}
 void Polyhedral_Mesh::toString()
 {
     std::cout << "\n\nResumen Polyhedros\n N vertices: " << vertexs.size() << std::endl; 
@@ -1393,7 +1456,7 @@ void Polyhedral_Mesh::toString()
     std::cout << "Imprimiendo valores de ARG" << std::endl;
     for(auto poly: polys)
     {
-        if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
             std::cout << (*poly).ARG << " ";
 
         std::cout << std::endl;
@@ -1463,7 +1526,6 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
         {
         case 12:
 
-        // Js
         // 0 -> 1 3 4
         // 1 -> 0 2 5
         // 2 -> 1 3 6
@@ -1543,7 +1605,7 @@ std::vector<Tri> Polyhedral_Mesh::toTris()
 
 // ------------------------------------------------------------- Metricas individuales.
 
-float Hexaedral::CalculateJ_index(int index)
+float Hexaedron::CalculateJ_index(int index)
 {
     auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
@@ -1553,7 +1615,7 @@ float Hexaedral::CalculateJ_index(int index)
     return glm::dot( normalized1, glm::cross( normalized2, normalized3));
 }
 
-float Hexaedral::SimulateMoveJ(int index, const glm::vec3& mov)
+float Hexaedron::SimulateMoveJ(int index, const glm::vec3& mov)
 {
     auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
@@ -1564,7 +1626,7 @@ float Hexaedral::SimulateMoveJ(int index, const glm::vec3& mov)
     return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
 }
 
-float Hexaedral::CalculateJR_index(int index)
+float Hexaedron::CalculateJR_index(int index)
 {
     
     float JsMax = *max_element(J.begin(), J.end());
@@ -1582,7 +1644,7 @@ float Hexaedral::CalculateJR_index(int index)
     return glm::dot( normalized1, glm::cross( normalized2, normalized3));
 }
 
-float Hexaedral::SimulateMoveJR(int index, const glm::vec3& new_pos)
+float Hexaedron::SimulateMoveJR(int index, const glm::vec3& new_pos)
 {
     std::vector <float> simulatedJ;
     std::vector <glm::vec3> vertexs_mod;
@@ -1619,7 +1681,7 @@ float Hexaedral::SimulateMoveJR(int index, const glm::vec3& new_pos)
     
 }
 
-float Hexaedral::CalculateJens_index(int index)
+float Hexaedron::CalculateJens_index(int index)
 {
     auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
@@ -1630,7 +1692,7 @@ float Hexaedral::CalculateJens_index(int index)
     
 }
 
-float Hexaedral::SimulateMoveJens(int index, const glm::vec3& mov)
+float Hexaedron::SimulateMoveJens(int index, const glm::vec3& mov)
 {
     return SimulateMoveJ(index, mov);
 }
@@ -2066,12 +2128,12 @@ float Pyramid::SimulateMoveJens(int index, const glm::vec3& new_pos)
 }
 
 
-float Tetrahedra::CalculateJ_index(int index)
+float Tetrahedron::CalculateJ_index(int index)
 {
     return 0.0f;
 }
 
-float Tetrahedra::SimulateMoveJ(int index, const glm::vec3& mov)
+float Tetrahedron::SimulateMoveJ(int index, const glm::vec3& mov)
 {
     auto [adj_index1, adj_index2, adj_index3] = GetAdjs(index);
 
@@ -2082,12 +2144,12 @@ float Tetrahedra::SimulateMoveJ(int index, const glm::vec3& mov)
     return glm::dot( normalizedv1, glm::cross( normalizedv2, normalizedv3));
 }
 
-float Tetrahedra::CalculateJR_index(int index)
+float Tetrahedron::CalculateJR_index(int index)
 {
     return 0.0f;
 }
 
-float Tetrahedra::SimulateMoveJR(int index, const glm::vec3& new_pos)
+float Tetrahedron::SimulateMoveJR(int index, const glm::vec3& new_pos)
 {
     std::vector <float> simulatedJ;
     std::vector <glm::vec3> vertexs_mod;
@@ -2123,13 +2185,13 @@ float Tetrahedra::SimulateMoveJR(int index, const glm::vec3& new_pos)
     return simulatedJ[index] / JsMax;
 }
 
-float Tetrahedra::CalculateJens_index(int index)
+float Tetrahedron::CalculateJens_index(int index)
 {
     return 0.0f;
     
 }
 
-float Tetrahedra::SimulateMoveJens(int index, const glm::vec3& new_pos)
+float Tetrahedron::SimulateMoveJens(int index, const glm::vec3& new_pos)
 {
     std::vector <float> simulatedJ;
     std::vector <glm::vec3> vertexs_mod;

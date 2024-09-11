@@ -7,25 +7,38 @@
 Mesh::Mesh(const std::string& filename)
 {
     
+    // Instanciar lector y darle el archivo deseado.
     Reader reader;
     reader.read_file(filename);
     
-    
     if (reader.read_status)
     {
+      // Vertices de la malla que son usados en la visualizacion
       vertices = reader.vertices;
       
       if (reader.has_polyhedrons)
       {
-        for (Vertex &vert: reader.vertices)
-            polyMesh.PushVertex(vert.position);
+        // Creacion de la version Polihedrica de los datos.
+        
+        // Vincular Indices y Tipos de Celdas leidos
+        polyMesh.BindPolyhedronsInfo(reader.indices, reader.cells_types_vector);
+        // Crear Polihedros
+        polyMesh.CreatePolyhedrons(vertices);
+        // Calcular metricas una vez inicializado la malla de poliedros
+        //polyMesh.CalculateMetrics();
+        // Convertir superficie de poliedros a tris.
+
+        /*
         for (auto &indice: reader.indices)
             polyMesh.PushIndex(indice);
-        std::cout << polyMesh.cou
-        //polyMesh.FormPolys(vertices);
+            
+        polyMesh.types = reader.cells_types_vector;
+        polyMesh.FormPolys(vertices);
         //polyMesh.CalculateJ();
         //polyMesh.GetJ();
-        //tris = polyMesh.toTris();
+        */
+        tris = polyMesh.toTris();
+        polyMesh.CalculateJ();
       } else
       {
         tris = reader.tris;
@@ -40,6 +53,12 @@ Mesh::Mesh(const std::string& filename)
 // TODO: Graficar lineas de tris
 
 }
+
+glm::vec3 Mesh::GetCenter()
+{
+    return glm::vec3( (boundary.min.x + boundary.max.x) / 2.0f, (boundary.min.y + boundary.max.y) / 2.0f, (boundary.min.z + boundary.max.z) / 2.0f  );
+}
+
 
 void Mesh::BindShader()
 {
@@ -291,10 +310,10 @@ void Mesh::Draw_normals()
 void Mesh::BindMeshLines()
 {
     lineVertices.clear();
-    
-    for (auto poly : polyMesh.polys) {
+    // TODO: ELIMINAR USO DE POLYS, HACER QUE LA LLAMDA SEA DIRECTA A LA CLASE Y NO USAR ELEMENTOS DE LA CLASE.
+    for (auto poly : polyMesh.polyhedrons) {
 
-        if (std::dynamic_pointer_cast<Hexaedral>(poly) != nullptr)
+        if (std::dynamic_pointer_cast<Hexaedron>(poly) != nullptr)
         {
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[1]).position);
@@ -332,7 +351,7 @@ void Mesh::BindMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
             lineVertices.push_back((*poly->vertexs_refs[7]).position);
         }
-        else if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        else if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
         {
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[1]).position);
@@ -437,9 +456,9 @@ void Mesh::UpdateMeshLines()
 {
     lineVertices.clear();
     
-    for (auto poly : polyMesh.polys) {
+    for (auto poly : polyMesh.polyhedrons) {
 
-        if (std::dynamic_pointer_cast<Hexaedral>(poly) != nullptr)
+        if (std::dynamic_pointer_cast<Hexaedron>(poly) != nullptr)
         {
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[1]).position);
@@ -477,7 +496,7 @@ void Mesh::UpdateMeshLines()
             lineVertices.push_back((*poly->vertexs_refs[3]).position);
             lineVertices.push_back((*poly->vertexs_refs[7]).position);
         }
-        else if (std::dynamic_pointer_cast<Tetrahedra>(poly) != nullptr)
+        else if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
         {
             lineVertices.push_back((*poly->vertexs_refs[0]).position);
             lineVertices.push_back((*poly->vertexs_refs[1]).position);
