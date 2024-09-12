@@ -155,11 +155,11 @@ public:
 };
 
 
-// Mesh compuesto por uno o mas polihedros
+// Clase para la malla de poliedros
 class Polyhedral_Mesh
     {
     private:
-        std::vector <glm::vec3> vertexs;
+        std::vector <glm::vec3> vertices;
         
         // Mapa para asociar cada índice de vértice con una lista de pares (poliedro, índice del vértice en el poliedro)
         std::unordered_map<size_t, std::vector<std::pair<size_t, size_t>>> vertex_to_polyhedron_map;
@@ -180,7 +180,6 @@ class Polyhedral_Mesh
 
         void CalculateJ();
 
-        std::vector<Vertex> toVertex();
         std::vector<Tri> toTris();
 
         bool includeHexa = true, includeTetra = true, includePyra = true, includePrism = true;

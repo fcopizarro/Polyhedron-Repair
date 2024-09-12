@@ -26,20 +26,10 @@ Mesh::Mesh(const std::string& filename)
         // Crear Polihedros
         polyMesh.CreatePolyhedrons(vertices);
         // Calcular metricas una vez inicializado la malla de poliedros
-        //polyMesh.CalculateMetrics();
-        // Convertir superficie de poliedros a tris.
-
-        /*
-        for (auto &indice: reader.indices)
-            polyMesh.PushIndex(indice);
-            
-        polyMesh.types = reader.cells_types_vector;
-        polyMesh.FormPolys(vertices);
-        //polyMesh.CalculateJ();
-        //polyMesh.GetJ();
-        */
-        tris = polyMesh.toTris();
         polyMesh.CalculateJ();
+        // Convertir superficie de poliedros a tris.
+        tris = polyMesh.toTris();
+
       } else
       {
         tris = reader.tris;

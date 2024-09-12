@@ -1441,14 +1441,14 @@ void Polyhedral_Mesh::CreatePolyhedrons(const std::vector<Vertex>& vertices)
 
 void Polyhedral_Mesh::toString()
 {
-    std::cout << "\n\nResumen Polyhedros\n N vertices: " << vertexs.size() << std::endl; 
+    std::cout << "\n\nResumen Polyhedros\n N vertices: " << vertices.size() << std::endl; 
 
     /*
     std::cout << "Imprimiendo vertices" << std::endl;
 
-    for (int i = 0; i < vertexs.size(); i++)
+    for (int i = 0; i < vertices.size(); i++)
     {
-        std::cout << vertexs[i].x << " " << vertexs[i].y << " " << vertexs[i].z << std::endl;
+        std::cout << vertices[i].x << " " << vertices[i].y << " " << vertices[i].z << std::endl;
     }
 
     std::cout << "\n\nImprimiendo valores de J" << std::endl;
@@ -1524,26 +1524,6 @@ void Polyhedral_Mesh::toString()
 
     std::cout << "\n\n\n" << std::endl;
     */
-}
-
-std::vector<Vertex> Polyhedral_Mesh::toVertex()
-{
-    std::vector <Vertex> converted;
-
-
-    for (glm::vec3 ver_: vertexs)
-    {
-        Vertex ver = { ver_, glm::vec3(0.0f), glm::vec3(0.5f)};
-        converted.push_back(ver);
-    }
-    
-
-    return converted;
-
-
-    
-
-
 }
     
 std::vector<Tri> Polyhedral_Mesh::toTris()  
