@@ -39,6 +39,7 @@ public:
     float SimulateJ(glm::vec3 );
     bool EasyFix(float t, int, int);
     bool GradFix(float t, int maxtrys, int selected_metric);
+    
 
 };
 
@@ -160,9 +161,14 @@ class Polyhedral_Mesh
     private:
         std::vector <glm::vec3> vertexs;
         
+        // Mapa para asociar cada índice de vértice con una lista de pares (poliedro, índice del vértice en el poliedro)
+        std::unordered_map<size_t, std::vector<std::pair<size_t, size_t>>> vertex_to_polyhedron_map;
         
         
     public:
+    
+        
+        std::string MapVertexIndex(int);
         std::vector <int> types;
         std::vector <std::vector <int>> indexs; 
         std::vector <std::shared_ptr<Polyhedron>> polyhedrons;

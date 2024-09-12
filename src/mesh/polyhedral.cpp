@@ -1364,6 +1364,30 @@ void Polyhedral_Mesh::BindPolyhedronsInfo(std::vector <std::vector<int>> indexs,
  * 
  * Nota: Esta función está diseñada para manejar formatos específicos de poliedros. Para añadir más tipos de poliedros en el futuro, se deberá modificar esta función.
  */
+
+std::string Polyhedral_Mesh::MapVertexIndex(int global_index)
+{    
+    // Buscar la clave en el mapa
+    auto it = vertex_to_polyhedron_map.find(global_index);
+    
+    std::string to_return;
+
+    // Verificar si la clave fue encontrada
+    if (it != vertex_to_polyhedron_map.end()) {
+        const auto& vec = it->second;
+        // Iterar sobre el vector asociado a la clave
+        to_return.append("\n");
+        for (const auto& pair : vec) {
+            // Imprimir cada par en el vector
+            //std::cout << "En clave " << key << ": (" << pair.first << ", " << pair.second << ")\n";
+            to_return.append("Js: " + std::to_string(polyhedrons[pair.first]->J[pair.second]) + "  P" + std::to_string(pair.first) + "V" + std::to_string(pair.second) + "\n");
+            to_return.append("Jens: " + std::to_string(polyhedrons[pair.first]->Jens[pair.second]) + "  P()\n");
+        }
+    }
+    
+    return to_return;
+}
+
 void Polyhedral_Mesh::CreatePolyhedrons(const std::vector<Vertex>& vertices)
 {
 
@@ -1376,7 +1400,14 @@ void Polyhedral_Mesh::CreatePolyhedrons(const std::vector<Vertex>& vertices)
         // Extraer vertices asociados al poliedro actual (i)
         // Se extrae la direccion del vertice que indican el indice j asociados al poliedro i
         for (int j = 0; j < indexs[i].size(); j++)
+        {
             vertex_refs.push_back(const_cast<Vertex *>(&vertices[indexs[i][j]]));
+            
+            // indexs[i][j] Contiene el indice del vertice global.
+            // vertex_refs contiene el indice del vertice local.
+            vertex_to_polyhedron_map[indexs[i][j]].emplace_back(polyhedrons.size(), vertex_refs.size() - 1);
+            
+        }
         
         // Crear objeto segun el tipo de poliedro que indique,
         // Dando la referencia de los vertices que le corresponde.

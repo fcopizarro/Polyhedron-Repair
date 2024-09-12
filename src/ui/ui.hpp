@@ -25,7 +25,7 @@ public:
 
     void Update(Scene&);
     void MainMenu(Scene&);
-    void EditVertexMenu(Mesh&);
+    void EditVertexMenu(Scene&);
     void JacobianMenu();
     void RatioMenu();
     void FixMenu(Mesh& );

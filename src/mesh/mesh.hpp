@@ -26,6 +26,10 @@ public:
 	void setVertexPosition(int index, float x, float y, float z);
 
 	Polyhedral_Mesh polyMesh;
+	
+	// Mapa para asociar cada vértice con una lista de pares (poliedro, índice del vértice en el poliedro)
+        std::unordered_map<glm::vec3*, std::vector<std::pair<Polyhedron*, size_t>>> vertex_to_polyhedron_map;
+
 
 	void updateNormals();
 	void UpdateMeshLines();
@@ -77,10 +81,6 @@ private:
 	std::vector<glm::quat> rotationsMeshes;
 	std::vector<glm::vec3> scalesMeshes;
 	std::vector<glm::mat4> matricesMeshes;
-
-	// Prevents textures from being loaded twice
-	std::vector<std::string> loadedTexName;
-	//std::vector<Texture> loadedTex;
 
 	// Loads a single mesh by its index
 	void loadMesh(unsigned int indMesh);

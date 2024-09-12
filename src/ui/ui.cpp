@@ -129,7 +129,7 @@ void UI::Update(Scene& scene)
 
     // Llamada a los menus que componen la interfaz del usuario.
     MainMenu(scene); // Menu Principal
-    if(showEditMenu)        EditVertexMenu(*scene.mesh);
+    if(showEditMenu)        EditVertexMenu(scene);
     if(showFixMenu)         FixMenu(*scene.mesh);
     if(showCustomizeMenu)   CustomizeMenu();
     if(showJacobianMenu)    JacobianMenu();
@@ -187,6 +187,7 @@ void UI::MainMenu(Scene& scene)
                   delete scene.mesh;
                   scene.mesh = NULL;
                   scene.mesh_in_scene = false;
+                  
 
                   // Limpiar metricas almacenadas
 
@@ -488,7 +489,7 @@ void UI::RatioMenu()
  * 
  * @param model Referencia al objeto `Mesh` que contiene la malla 3D que se está editando.
  */
-void UI::EditVertexMenu(Mesh& mesh)
+void UI::EditVertexMenu(Scene& scene)
 {
 
 
@@ -527,35 +528,20 @@ void UI::EditVertexMenu(Mesh& mesh)
                 
                 
                 // Cambiar posicion en la malla del vertice cambiado.
-                mesh.setVertexPosition(closestIndex, vec4a[0], vec4a[1], vec4a[2]);
+                scene.mesh->setVertexPosition(closestIndex, vec4a[0], vec4a[1], vec4a[2]);
                 
                 // Actualizar Grafica de la malla
-                mesh.updateNormals();
-                mesh.UpdateMeshLines();
+                scene.mesh->updateNormals();
+                scene.mesh->UpdateMeshLines();
                 
                 // Actualizar Metricas de los poliedros
-                mesh.polyMesh.CalculateJ();
-                //mesh.polyMesh.GetJ();
-                
-                // Copiar metricas actualizadas de los poliedros
-                /*     ACTUALIZARRRRR
-                JTotal = mesh.polyMesh.Jtotal; 
-                Jdata = mesh.polyMesh.Jdata;
-                //JRdata = mesh.polyMesh.JRdata; // DESHABILITADA
-                JENSdata = mesh.polyMesh.JENSdata;
-                EQdata = mesh.polyMesh.EQdata;
-                ARtotal = mesh.polyMesh.ARtotal;
-                ARdata = mesh.polyMesh.ARdata;
-                ARGdata = mesh.polyMesh.ARGdata;
-                ARENdata = mesh.polyMesh.ARENdata;
-                */
-                
-                
-                // TODO: Vincular metricas sin necesidad de almacenarlas
-                // TODO: Mostrar metricas del vertice seleccionado
-                
-
+                scene.mesh->polyMesh.CalculateJ();
             }
+            
+             // TODO: Mostrar metricas del vertice seleccionado
+             
+            if (scene.mesh_in_scene)
+                ImGui::Text("%s", scene.mesh->polyMesh.MapVertexIndex(closestIndex).c_str());
 
 
         } else {
