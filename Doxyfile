@@ -1,0 +1,121 @@
+# Doxyfile 1.8.20
+
+# ---------------------------------------------------------------------------
+# General configuration
+# ---------------------------------------------------------------------------
+
+# The project name.
+PROJECT_NAME           = Polyhedron-Repair
+
+# The project version.
+PROJECT_VERSION        = 1.0
+
+# The tag value for the project.
+PROJECT_BRIEF          = "Aplicación gráfica 3D creada para un proyecto de memoria."
+
+# The repository URL for the project.
+REPOSITORY               = https://github.com/fcopizarro/Polyhedron-Repair
+
+# The output directory for the documentation.
+OUTPUT_DIRECTORY       = docs
+
+# The format of the generated documentation (html, latex, man, etc.).
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+
+# If YES, Doxygen will create a lot of additional information in the generated documentation.
+FULL_PATH_NAMES        = YES
+CASE_SENSITIVE_NAMES   = NO
+
+# The list of source files to be documented.
+INPUT                  = src/
+
+# The extensions of the files to be parsed.
+FILE_PATTERNS          = *.cpp *.hpp
+RECURSIVE = YES
+
+
+# Whether to include private members in the documentation.
+EXTRACT_ALL            = NO
+
+# Whether to extract all functions and variables, even if they are not documented.
+EXTRACT_PRIVATE        = NO
+
+# Whether to include member functions and variables in the documentation.
+EXTRACT_STATIC         = NO
+
+# The maximum number of errors and warnings to be reported before stopping the generation of documentation.
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = YES
+
+# Whether to include the documentation for the entire class hierarchy.
+HAVE_DOT               = NO
+
+# The format for the documentation.
+OUTPUT_FORMAT          = html
+
+# ---------------------------------------------------------------------------
+# Configuration options for HTML output
+# ---------------------------------------------------------------------------
+
+# The name of the main page of the HTML documentation.
+HTML_HEADER            =
+
+# The name of the footer for the HTML documentation.
+HTML_FOOTER            =
+
+# The name of the main page of the HTML documentation.
+HTML_INDEX             = index.html
+
+# ---------------------------------------------------------------------------
+# Configuration options for LaTeX output
+# ---------------------------------------------------------------------------
+
+# The name of the main page of the LaTeX documentation.
+LATEX_HEADER           =
+
+# The name of the footer for the LaTeX documentation.
+LATEX_FOOTER           =
+
+# The name of the main page of the LaTeX documentation.
+LATEX_INDEX            = index.tex
+
+# ---------------------------------------------------------------------------
+# Configuration options for Man output
+# ---------------------------------------------------------------------------
+
+# The name of the main page of the Man documentation.
+MAN_INDEX              = index.1
+
+# ---------------------------------------------------------------------------
+# Configuration options for RTF output
+# ---------------------------------------------------------------------------
+
+# The name of the main page of the RTF documentation.
+RTF_INDEX              = index.rtf
+
+# ---------------------------------------------------------------------------
+# Configuration options for XML output
+# ---------------------------------------------------------------------------
+
+# The name of the main page of the XML documentation.
+XML_INDEX              = index.xml
+
+# ---------------------------------------------------------------------------
+# Configuration options for diagram generation
+# ---------------------------------------------------------------------------
+
+# Whether to generate diagrams.
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+GRAPHICAL_HIERARCHY    = YES
+DOT_PATH               = /usr/bin/dot
+
+# ---------------------------------------------------------------------------
+# Miscellaneous options
+# ---------------------------------------------------------------------------
+
+# Whether to show the examples in the documentation.
+SHOW_EXAMPLES          = YES

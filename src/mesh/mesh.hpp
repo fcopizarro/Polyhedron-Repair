@@ -6,6 +6,13 @@
 #include "mesh/polyhedral.hpp"
 #include "rw/Reader.hpp"
 
+/**
+ * @brief Representa una malla 3D.
+ *
+ * La clase `Mesh` encapsula los datos y métodos necesarios para manejar y renderizar una malla 3D,
+ * incluyendo sus vértices, caras y caja de contorno. También proporciona funcionalidad para dibujar la
+ * malla y sus normales, actualizar las posiciones de los vértices y gestionar los datos poliedrales asociados.
+ */
 class Mesh
 {
 public:
@@ -62,33 +69,10 @@ private:
 
 	GLuint vaoMeshLines;
 	GLuint vboMeshLines;
-
-
 	GLuint Normal_VBO;
-
 	glm::vec3 min;
 	glm::vec3 max;
-	// Variables for easy access
 
-    std::string obtenerExtension(const std::string&);
-    void read_obj(const std::string&);
-    void read_vtk(const std::string&);
-	std::vector<unsigned char> data;
 
-	
-	
-	std::vector<glm::vec3> translationsMeshes;
-	std::vector<glm::quat> rotationsMeshes;
-	std::vector<glm::vec3> scalesMeshes;
-	std::vector<glm::mat4> matricesMeshes;
-
-	// Loads a single mesh by its index
-	void loadMesh(unsigned int indMesh);
-
-	// Traverses a node recursively, so it essentially traverses all connected nodes
-	void traverseNode(unsigned int nextNode, glm::mat4 matrix = glm::mat4(1.0f));
-
-	// Gets the binary data from a file
-	std::vector<unsigned char> getData();
 	
 };

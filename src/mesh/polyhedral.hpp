@@ -2,6 +2,12 @@
 
 #include "common.hpp"
 
+
+/**
+ * @class Polyhedron
+ * @brief Clase abstracta de poliedro, proporciona la estructura necesaria para cada uno de los poliedros especificos.
+ * 
+ */
 class Polyhedron
 {
     // Clase abstracta que será utilizada como estructura de cada uno de los poliedros
@@ -86,6 +92,14 @@ public:
     
 };
 
+
+/**
+ * @class Tetrahedron
+ * @brief Representa un tetraedro, una figura poliedral con 4 vértices, 6 aristas y 4 caras.
+ * 
+ * La clase `Tetrahedron` hereda de `Polyhedron` e implementa métodos específicos para el cálculo de métricas
+ * y simulación de movimientos asociados a un tetraedro.
+ */
 class Tetrahedron: public virtual Polyhedron
 {
 private:
@@ -111,6 +125,14 @@ public:
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
+
+/**
+ * @class Pyramid
+ * @brief Representa una piramide, una figura poliedral con 5 vértices, 8 aristas y 5 caras.
+ * 
+ * La clase `Pyramid` hereda de `Polyhedron` e implementa métodos específicos para el cálculo de métricas
+ * y simulación de movimientos asociados a una píramide.
+ */
 class Pyramid: public virtual Polyhedron
 {
 private:
@@ -139,6 +161,14 @@ public:
     std::tuple<int, int, int> GetAdjs(int) override;
 };
 
+
+/**
+ * @class Prism
+ * @brief Representa un prisma, una figura poliedral con 6 vértices, 9 aristas y 5 caras.
+ * 
+ * La clase `Prism` hereda de `Polyhedron` e implementa métodos específicos para el cálculo de métricas
+ * y simulación de movimientos asociados a un prisma.
+ */
 class Prism: public virtual Polyhedron
 {
 private:
@@ -166,7 +196,12 @@ public:
 };
 
 
-// Clase para la malla de poliedros
+/**
+ * @class Polyhedral_Mesh
+ * @brief Malla de poliedros, es la principal union entre todos los poliedros instanciados, permitiendo la interaccion directa con ellos.
+ * 
+ * Version poliedrica de la malla ingresada.
+ */
 class Polyhedral_Mesh
     {
     private:

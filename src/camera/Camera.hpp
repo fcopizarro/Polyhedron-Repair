@@ -4,7 +4,12 @@
 #include "shader/Shader.hpp"
 
 
-
+/**
+ * @brief Clase que representa una cámara en el sistema de coordenadas 3D.
+ * 
+ * La clase `Camera` se encarga de manejar la posición, orientación y configuración de la cámara en la escena 3D.
+ * Permite ajustar la vista, el campo de visión, y gestionar las entradas para mover la cámara.
+ */
 class Camera{
 
     public:

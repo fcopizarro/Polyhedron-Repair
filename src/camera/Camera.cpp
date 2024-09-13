@@ -1,5 +1,14 @@
 #include "Camera.hpp"
 
+/**
+ * @brief Constructor de la clase Camera.
+ * 
+ * Inicializa los parámetros de la cámara y establece su posición inicial, así como el ángulo de inclinación y orientación predeterminados.
+ * 
+ * @param width Ancho de la ventana de visualización.
+ * @param height Alto de la ventana de visualización.
+ * @param position Posición inicial de la cámara.
+ */
 Camera::Camera(int width, int height, glm::vec3 position)
 {
 	Camera::width = width;
@@ -11,6 +20,18 @@ Camera::Camera(int width, int height, glm::vec3 position)
 	cameraTarget = glm::vec3(0.0f);
 }
 
+
+/**
+ * @brief Configura las matrices de vista y proyección de la cámara y las envía al shader.
+ * 
+ * Ajusta las matrices de vista y proyección de la cámara según los parámetros proporcionados y el estado de `centerCameraActivated`.
+ * 
+ * @param FOVdeg Campo de visión de la cámara en grados.
+ * @param nearPlane Distancia del plano cercano de recorte.
+ * @param farPlane Distancia del plano lejano de recorte.
+ * @param shader Objeto `Shader` al que se le asignará la matriz de la cámara.
+ * @param uniform Nombre del uniforme en el shader para la matriz.
+ */
 void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shader, const char* uniform)
 {
 	if (centerCameraActivated)
@@ -48,24 +69,46 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
 	
 }
 
+/**
+ * @brief Obtiene la matriz de vista de la cámara.
+ * 
+ * @return La matriz de vista de la cámara como un `glm::mat4`.
+ */
 glm::mat4 Camera::GetView()
 {
 	return view;
 }
 
 
+/**
+ * @brief Obtiene la matriz de proyección de la cámara.
+ * 
+ * @return La matriz de proyección de la cámara como un `glm::mat4`.
+ */
 glm::mat4 Camera::GetProjection()
 {
 	return projection;
 }
 
 
-
+/**
+ * @brief Obtiene la posición actual de la cámara.
+ * 
+ * @return La posición de la cámara como un `glm::vec3`.
+ */
 glm::vec3 Camera::GetPosition()
 {
 	return Position;
 }
 
+
+/**
+ * @brief Maneja los eventos de entrada para controlar la cámara.
+ * 
+ * Ajusta la posición y la configuración de la cámara según las teclas presionadas y el movimiento del ratón.
+ * 
+ * @param event Evento SDL que contiene información de entrada.
+ */
 void Camera::Inputs(SDL_Event& event)
 {
     

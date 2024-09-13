@@ -4,10 +4,12 @@
 
 Aplicación gráfica 3D creada para un proyecto de memoria.
 
-Funcionaa tanto con mallas poliedricas como de polígonos, ofreciendo la mayoria de funcionalidades para las primeras.
+Funciona tanto con mallas poliedricas como de polígonos, ofreciendo la mayoria de funcionalidades para las primeras.
 
 Permite cargar y guardar mallas, repararlas de forma automática o manual según lo necesites y visualizar las métricas en tiempo real mientras trabajas.
 </div>
+
+**Nota:** Se puede ver la documentacion en docs/html/index.html
 
 ## Aclaración
 
