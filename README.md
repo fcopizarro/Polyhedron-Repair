@@ -26,7 +26,9 @@ Y con los siguientes formatos:
 
 ## Compatibilidad
 
-Al momento de escrito esto el software funciona tanto en Windows como en Linux (probado en el distro Ubuntu 24).
+Al momento de escrito esto el software funciona tanto en Windows (10 y 11) como en Linux (probado en el distro Ubuntu 24).
+
+Adicionalmente, fue probado con una targeta gráfica integrada (Intel UHD Graphics), alcanzando unos 20-30 fps en un modelo de mas de 1.000.000 de poliedros.
 
 ## Instalacion
 
