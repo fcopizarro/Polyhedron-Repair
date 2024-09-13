@@ -66,3 +66,11 @@ Los controles de la camara son:
 - 'Boton Central del Mouse`: Rotar la camara sobre el objeto
 - `Click Izquierdo`: Seleccionar vertices en el modo edición
 
+
+## Más archivos de prueba
+
+ - [10M Hexaedros](https://usmcl-my.sharepoint.com/:u:/g/personal/francisco_pizarroj_usm_cl/ES7QYxDdYspOoNPkDgB4hX4BbzMAgsfkXGfNdojCqbmHOw?e=7SseZZ)
+ - [1M Hexaedros](https://usmcl-my.sharepoint.com/:u:/g/personal/francisco_pizarroj_usm_cl/ESyldUEyK2ZAsORfYhUtJp4BxNfJJpyXTl6AtFCubbQ-Dg?e=hZQcGS)
+ - [100K Hexaedros](https://usmcl-my.sharepoint.com/:u:/g/personal/francisco_pizarroj_usm_cl/EU4IAqiQ5eJFhUIDpcuywWgB6bayOzOuRih-OgP5YkbSqg?e=bfAvEr)
+ - [10K Hexaedros](https://usmcl-my.sharepoint.com/:u:/g/personal/francisco_pizarroj_usm_cl/EXuLmDOZHxxFnVXumQtVIIEBfcQFhcJeN7l4qHturOpCFg?e=janelX)
+ - [1K Hexaedros](https://usmcl-my.sharepoint.com/:u:/g/personal/francisco_pizarroj_usm_cl/EW0foyyqUA9BqnGZJQdNyxYBEkhgl8YC8YZmjbhwWj3Zgg?e=zbX3A1)
