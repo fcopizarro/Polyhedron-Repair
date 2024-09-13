@@ -396,6 +396,7 @@ void UI::JacobianMenu()
     ImGui::End();
 }
 
+
 /**
  * @brief Muestra un menú para visualizar un histograma y ajustar las métricas basadas en la Relacion de Aspecto.
  * 
@@ -491,18 +492,17 @@ void UI::RatioMenu()
  */
 void UI::EditVertexMenu(Scene& scene)
 {
-
-
+    // Setear posicion y tamaño de la ventana
     ImGui::SetNextWindowSize(ImVec2((float)300.0f, (float)250.0f));
     ImGui::SetNextWindowPos(ImVec2((float)width - 250.0f - 10.0f , 0));
 
-    ImGui::Begin("Menu Edicion" , &showEditMenu);                          // Create a window called "Hello, world!" and append into it.
+    ImGui::Begin("Menu Edicion" , &showEditMenu);  
     
     ImGui::Checkbox("Modo Edición", &editMode);
 
   
     // En caso de que se este en el modo de edicion
-    // Cambiando la forma en que se grafican las lineas
+    // Cambiando la forma en que se grafican los puntos
     if (editMode)
     {
         // Verificar si se ha seleccionado algun vertice valido.
@@ -535,7 +535,7 @@ void UI::EditVertexMenu(Scene& scene)
                 scene.mesh->UpdateMeshLines();
                 
                 // Actualizar Metricas de los poliedros
-                scene.mesh->polyMesh.CalculateJ();
+                scene.mesh->polyMesh.CalculateMetrics();
             }
             
              // TODO: Mostrar metricas del vertice seleccionado
@@ -617,11 +617,10 @@ void UI::CustomizeMenu()
  * - Generar un archivo con los resultados de la reparación.
  * 
  * Variables:
- * - `scaleFix`: Ajusta la calidad mínima de la reparación. Valor inicial es 0.0f.
- * - `metodo`: Selecciona el método de reparación. `0` para Aleatorio y `1` para Gradiante.
- * - `e`: Selecciona la métrica a reparar. `0` para Scaled Jacobian, `1` para Jacobian Ratio, `2` para Jens.
- * - `intentos`: Define el número de intentos para la reparación. Valor inicial es 1000.
- * - `generados`: Contador para generar nombres de archivo únicos para los resultados.
+ * - `threshold`: Ajusta la calidad mínima de la reparación. Valor inicial es 0.0f.
+ * - `repair_method`: Selecciona el método de reparación. `0` para Aleatorio y `1` para Gradiante.
+ * - `metric_to_use`: Selecciona la métrica a reparar. `0` para Scaled Jacobian, `1` para Jacobian Ratio, `2` para Jens.
+ * - `tries`: Define el número de intentos para la reparación. Valor inicial es 1000.
  * 
  * @param mesh Objeto de la clase `Mesh` que representa el modelo de la malla a reparar.
  */
@@ -654,28 +653,17 @@ void UI::FixMenu(Mesh& mesh)
     if (ImGui::Button("Reparar Malla"))
     {
         mesh.polyMesh.FixJ(threshold, tries, repair_method, metric_to_use);    
+        // TODO: ACTUALIZAR LINEAS
         mesh.UpdateModelGraph();
         mesh.updateNormals();
         mesh.UpdateMeshLines();
 
-        mesh.polyMesh.CalculateJ();
+        mesh.polyMesh.CalculateMetrics();
         
-        /*
-        JTotal.clear();
-
-        JTotal = &mesh.polyMesh.Jtotal;
-        Jdata = &mesh.polyMesh.Jdata;
-        JRdata = &mesh.polyMesh.JRdata;
-        JENSdata = &mesh.polyMesh.JENSdata;
-        EQdata = &mesh.polyMesh.EQdata;
-
-        ARtotal = &mesh.polyMesh.ARtotal;
-        ARdata = &mesh.polyMesh.ARdata;
-        ARGdata = &mesh.polyMesh.ARGdata;
-        ARENdata = &mesh.polyMesh.ARENdata;
-        */	
     }    
 
+
+    /* Funcion usada en el DEBUG, Sirve para dar un .txt con resultados, para usarlos en otro contexto
     static int generados = 0;
 
      if (ImGui::Button("Generar Resultados"))
@@ -687,7 +675,7 @@ void UI::FixMenu(Mesh& mesh)
         outfile << "Resumen Js" << std::endl;
         for (auto poly: mesh.polyMesh.polyhedrons)
         {
-            for (float J_: poly->J)
+            for (float J_: poly->Js)
                 outfile << std::to_string(J_) << std::endl;
         }
 
@@ -710,6 +698,7 @@ void UI::FixMenu(Mesh& mesh)
 
         generados ++;
     }    
+    */
     ImGui::End();
 
 }

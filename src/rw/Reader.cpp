@@ -1,8 +1,6 @@
 #include "Reader.hpp"
 
-Reader::Reader()
-{
-}
+Reader::Reader(){}
 
 void Reader::read_file(const std::string filename)
 {
@@ -27,7 +25,6 @@ void Reader::read_file(const std::string filename)
     }
     
 }
-
 
 /**
  * @brief Verifica si una línea de texto está vacía.
@@ -54,8 +51,15 @@ bool Reader::is_line_empty(std::string line)
 }
 
 
-
-
+/**
+ * @brief Obtiene la extensión del archivo a partir de su nombre.
+ * 
+ * Este método busca el último punto en el nombre del archivo y devuelve la subcadena que sigue a ese punto como la extensión del archivo.
+ * Si no se encuentra ningún punto, se devuelve una cadena vacía.
+ * 
+ * @param nombreArchivo El nombre del archivo del cual se extraerá la extensión.
+ * @return La extensión del archivo como una cadena de texto. Si no hay extensión, devuelve una cadena vacía.
+ */
 std::string Reader::getExtension(const std::string& nombreArchivo) {
     // Buscar el último punto en el nombre del archivo
     size_t puntoPos = nombreArchivo.find_last_of('.');
@@ -69,8 +73,20 @@ std::string Reader::getExtension(const std::string& nombreArchivo) {
     return nombreArchivo.substr(puntoPos + 1);
 }
 
-
-
+/**
+ * @brief Lee y procesa un archivo .obj para extraer vértices y caras.
+ * 
+ * Este método abre un archivo .obj especificado por `filename`, lee su contenido línea por línea y extrae la información de vértices y caras.
+ * Los vértices se almacenan en el vector `vertices`, y las caras (triángulos y cuadrados) se almacenan en el vector `tris`.
+ * 
+ * - Vértices (`v`) se extraen y se almacenan en la estructura `Vertex`.
+ * - Caras (`f`) se procesan para crear triángulos y cuadrados, los cuales se almacenan en la estructura `Tri`.
+ * - Solo se procesan líneas que comienzan con `v` y `f`; otras líneas se ignoran.
+ * 
+ * @param filename El nombre del archivo .obj a leer.
+ * 
+ * Si el archivo no se puede abrir, se muestra un mensaje de error en la salida estándar de error.
+ */
 void Reader::read_obj(const std::string& filename)
 {
       // Intentar abrir el archivo dado.
@@ -169,7 +185,22 @@ void Reader::read_obj(const std::string& filename)
 }
 
 
-
+/**
+ * @brief Lee y procesa un archivo .vtk para extraer información de vértices y celdas.
+ * 
+ * Este método abre un archivo .vtk especificado por `filename`, lee su cabecera y contenido, y extrae datos sobre vértices y celdas.
+ * El archivo debe estar en formato de "UNSTRUCTURED_GRID". El método extrae la información de los puntos y las celdas y la almacena en las estructuras adecuadas.
+ * 
+ * - La cabecera del archivo .vtk se procesa para obtener la versión, nombre, codificación, y tipo de dataset.
+ * - Se verifica que el tipo de dataset sea "UNSTRUCTURED_GRID".
+ * - Se leen los puntos 3D y se almacenan en el vector `vertices`.
+ * - Se leen las celdas y sus índices, que se almacenan en el vector `indices`.
+ * - Se leen los tipos de celdas y se almacenan en `cells_types_vector`.
+ * 
+ * @param filename El nombre del archivo .vtk a leer.
+ * 
+ * Si el archivo no se puede abrir, se muestra un mensaje de error en la salida estándar de error. Si el tipo de dataset no es soportado, se muestra un mensaje indicando que el tipo de dataset no es compatible.
+ */
 void Reader::read_vtk(const std::string& filename)
 {
     // Intentar abrir el archivo
@@ -295,7 +326,7 @@ void Reader::read_vtk(const std::string& filename)
     for (int i = 0; i < points_num; i += 1)
     {
        // TODO: Eliminar del vertice el valor del color.
-        vertices.push_back({ glm::vec3(each_point[init], each_point[init+1], each_point[init+2]), glm::vec3(0.0f), glm::vec3(0.5f)});
+        vertices.push_back({ glm::vec3(each_point[init], each_point[init+1], each_point[init+2]), glm::vec3(0.0f)});
         init +=3;
     }
 

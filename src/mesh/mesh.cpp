@@ -26,7 +26,7 @@ Mesh::Mesh(const std::string& filename)
         // Crear Polihedros
         polyMesh.CreatePolyhedrons(vertices);
         // Calcular metricas una vez inicializado la malla de poliedros
-        polyMesh.CalculateJ();
+        polyMesh.CalculateMetrics();
         // Convertir superficie de poliedros a tris.
         tris = polyMesh.toTris();
 
@@ -307,119 +307,119 @@ void Mesh::BindMeshLines()
 
         if (std::dynamic_pointer_cast<Hexaedron>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
             
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
         }
         else if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
         }
         else if (std::dynamic_pointer_cast<Pyramid>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
         }
         else if (std::dynamic_pointer_cast<Prism>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
             
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
 
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
 
         }
@@ -452,119 +452,119 @@ void Mesh::UpdateMeshLines()
 
         if (std::dynamic_pointer_cast<Hexaedron>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
             
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[6]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[6]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[7]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[7]).position);
         }
         else if (std::dynamic_pointer_cast<Tetrahedron>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
         }
         else if (std::dynamic_pointer_cast<Pyramid>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
         }
         else if (std::dynamic_pointer_cast<Prism>(poly) != nullptr)
         {
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
 
             
-            lineVertices.push_back((*poly->vertexs_refs[0]).position);
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[0]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[1]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[1]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[2]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[2]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
 
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[4]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[4]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
-            lineVertices.push_back((*poly->vertexs_refs[3]).position);
-            lineVertices.push_back((*poly->vertexs_refs[5]).position);
+            lineVertices.push_back((*poly->vertices_ptr[3]).position);
+            lineVertices.push_back((*poly->vertices_ptr[5]).position);
 
 
         }

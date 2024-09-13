@@ -2,10 +2,10 @@
 
 #include "common.hpp"
 
+
 #include "camera/Camera.hpp"
 #include "shader/Shader.hpp"
 #include "mesh/mesh.hpp"
-#include <math.h>
 
 class Scene;
 
@@ -76,7 +76,5 @@ private:
     bool show_demo_window = false;
     bool show_another_window = false;
 
-    ImVec4 normals_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-    float normal_scale = 0.1f;
 
 };

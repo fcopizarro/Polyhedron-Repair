@@ -30,7 +30,6 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(src/)
 
-list(APPEND modules ${SDL2_LIBRARIES})
 list(APPEND modules ${GLEW_LIBRARIES})
 list(APPEND modules ${OPENGL_LIBRARIES})
 
@@ -73,7 +72,12 @@ target_include_directories(implot PUBLIC ${IMPLOT_PATH})
 target_link_libraries(implot PUBLIC imgui)
 list(APPEND modules implot)
 
+message(STATUS "SDL2_INCLUDE_DIRS: ${SDL2_INCLUDE_DIRS}")
+message(STATUS "SDL2_LIBRARIES: ${SDL2_LIBRARIES}")
+message(STATUS "GLEW Libraries: ${GLEW_LIBRARIES}")
+message(STATUS "OpenGL Libraries: ${OPENGL_LIBRARIES}")
 
+list(APPEND modules ${SDL2_LIBRARIES})
 
 # ----------------- Exec ----------------------
 add_executable(${CMAKE_PROJECT_NAME} 

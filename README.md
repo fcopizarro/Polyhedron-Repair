@@ -26,7 +26,7 @@ Y con los siguientes formatos:
 
 ## Compatibilidad
 
-Al momento de escrito esto el software funciona tanto en Windows como en Linux.
+Al momento de escrito esto el software funciona tanto en Windows como en Linux (probado en el distro Ubuntu 24).
 
 ## Instalacion
 
@@ -58,20 +58,7 @@ La mayoria de interacciones con la escena se pueden realizar a través de los me
 
 Los controles de la camara son:
 
-`C`: cambiar entre el modo centrado y el modo libre.
-
-[Modo Libre]
-- `WASD`: Mover la camara por el espacio
-- `Boton Central del Mouse`: Rotar la camara
-- `Click Izquierdo`: Seleccionar vertices en el modo edición
-
 [Modo Centrado]
 - 'Boton Central del Mouse`: Rotar la camara sobre el objeto
 - `Click Izquierdo`: Seleccionar vertices en el modo edición
 
-  ## Diagramas
-
-# TODO: Hacer un Struct o Class que permita ingresar metricas facilmente.
-# TODO: Implementar .vtk nativo
-
-## Clases
